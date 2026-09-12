@@ -1,0 +1,32 @@
+# Isaac / Omniverse / Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Bags and large sim dumps (keep off GitHub)
+*.bag
+*.mcap
+*.db3
+*.usd.bak
+output/
+_out/
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Archives
+*.tar.gz
+*.zip
