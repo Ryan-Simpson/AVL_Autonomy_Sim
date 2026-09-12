@@ -23,7 +23,8 @@ This work presents AVL Autonomy Sim, a digital twin platform in NVIDIA Isaac Sim
 | VLP-16 sim-to-real (poster result) | Replacing Chrono `avl_simulator` |
 
 Fall 2026 deliverables: [docs/FALL_2026_BAHR_BRIEF.md](docs/FALL_2026_BAHR_BRIEF.md).  
-Create the GitHub repo with [docs/GIT_PUSH.md](docs/GIT_PUSH.md).
+Isaac literature and people: [docs/ISAAC_RESEARCH_MAP.md](docs/ISAAC_RESEARCH_MAP.md).  
+GitHub push steps: [docs/GIT_PUSH.md](docs/GIT_PUSH.md).
 
 ## Layout
 
