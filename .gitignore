@@ -6,6 +6,17 @@ __pycache__/
 venv/
 *.egg-info/
 
+# ROS 2 / colcon / C++
+build/
+install/
+log/
+compile_commands.json
+.clangd
+*.o
+*.a
+*.so
+*.pcd
+
 # Secrets
 .env
 .env.*
@@ -19,6 +30,9 @@ venv/
 output/
 _out/
 logs/
+.gazebo/
+.ignition/
+.gz/
 
 # OS / editor
 .DS_Store

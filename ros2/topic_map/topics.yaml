@@ -1,0 +1,28 @@
+# STATUS: draft — freeze only after Jetson inventory
+version: 0
+status: draft
+frame_ids:
+  map: map
+  odom: odom
+  base_link: base_link
+topics:
+  cmd_vel:
+    name: /cmd_vel
+    type: geometry_msgs/msg/Twist
+    direction: subscribe
+  odom:
+    name: /odom
+    type: nav_msgs/msg/Odometry
+    direction: publish
+  imu:
+    name: /imu/data
+    type: sensor_msgs/msg/Imu
+    direction: publish
+  gps:
+    name: /gps/fix
+    type: sensor_msgs/msg/NavSatFix
+    direction: publish
+  lidar:
+    name: /velodyne_points
+    type: sensor_msgs/msg/PointCloud2
+    direction: publish
