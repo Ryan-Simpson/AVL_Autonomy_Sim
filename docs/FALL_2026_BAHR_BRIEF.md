@@ -33,5 +33,5 @@ If the Jetson stack talks to Gazebo (and optionally Isaac) through the same ROS 
 | D5 | 4–6 page paper draft |
 | S1 | *(stretch)* Same frozen topics on Isaac Sim |
 
-Design: [superpowers/specs/2026-09-15-gazebo-first-design.md](superpowers/specs/2026-09-15-gazebo-first-design.md)  
-Plan: [superpowers/plans/2026-09-15-gazebo-first-closed-loop.md](superpowers/plans/2026-09-15-gazebo-first-closed-loop.md)
+Design: [design/2026-09-15-gazebo-first-design.md](design/2026-09-15-gazebo-first-design.md)  
+Plan: [plans/2026-09-15-gazebo-first-closed-loop.md](plans/2026-09-15-gazebo-first-closed-loop.md)

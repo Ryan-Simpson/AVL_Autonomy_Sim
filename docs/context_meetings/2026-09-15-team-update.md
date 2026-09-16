@@ -39,8 +39,8 @@ Build order:
 |-----|---------|
 | [README.md](../../README.md) | Product abstract + layout |
 | [FALL_2026_BAHR_BRIEF.md](../FALL_2026_BAHR_BRIEF.md) | Fall deliverables |
-| [gazebo-first design](../superpowers/specs/2026-09-15-gazebo-first-design.md) | Architecture |
-| [gazebo-first plan](../superpowers/plans/2026-09-15-gazebo-first-closed-loop.md) | Task breakdown |
+| [gazebo-first design](../design/2026-09-15-gazebo-first-design.md) | Architecture |
+| [gazebo-first plan](../plans/2026-09-15-gazebo-first-closed-loop.md) | Task breakdown |
 | [topic map](../../ros2/topic_map/TOPICS.md) | Draft Jetson topic contract |
 
 ## Sync note

@@ -21,8 +21,8 @@ This work presents AVL Autonomy Sim, a digital twin platform for Cal Poly Pomona
 3. Measure **VLP-16** sim-to-real  
 4. **Isaac** only if time remains, on the same contract  
 
-Design: [docs/superpowers/specs/2026-09-15-gazebo-first-design.md](docs/superpowers/specs/2026-09-15-gazebo-first-design.md)  
-Plan: [docs/superpowers/plans/2026-09-15-gazebo-first-closed-loop.md](docs/superpowers/plans/2026-09-15-gazebo-first-closed-loop.md)
+Design: [docs/design/2026-09-15-gazebo-first-design.md](docs/design/2026-09-15-gazebo-first-design.md)  
+Plan: [docs/plans/2026-09-15-gazebo-first-closed-loop.md](docs/plans/2026-09-15-gazebo-first-closed-loop.md)
 
 ## Scope
 
@@ -48,6 +48,10 @@ AVL_Autonomy_Sim/
 ├── isaac/            # Optional Phase 4
 ├── ros2/             # Bridge packages + topic_map
 ├── docs/
+│   ├── design/       # Architecture / specs
+│   ├── plans/        # Implementation plans
+│   ├── context_meetings/
+│   └── …
 └── README.md
 ```
 

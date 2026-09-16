@@ -1,6 +1,6 @@
 # Gazebo-First Closed Loop Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For implementers:** Work this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Stand up AVL Autonomy Sim as a Gazebo-primary, C++-heavy ROS 2 twin with frozen Jetson topic names, a VLP-16 sim-to-real poster path, and Isaac deferred until the closed loop works.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** ROS 2 Humble, Gazebo (Harmonic preferred with Humble via `ros_gz`), C++17, `rclcpp`, `sensor_msgs` / `nav_msgs` / `geometry_msgs`, URDF/xacro, optional Isaac Sim later.
 
-**Spec:** [docs/superpowers/specs/2026-09-15-gazebo-first-design.md](../specs/2026-09-15-gazebo-first-design.md)
+**Spec:** [docs/design/2026-09-15-gazebo-first-design.md](../design/2026-09-15-gazebo-first-design.md)
 
 ## Global Constraints
 
@@ -81,7 +81,7 @@ Create `ros2/topic_map/TOPICS.md` explaining draft vs frozen and Jetson-wins rul
 - [ ] **Step 5: Commit**
 
 ```bash
-git add README.md docs/FALL_2026_BAHR_BRIEF.md .gitignore gazebo ros2/topic_map docs/superpowers
+git add README.md docs/FALL_2026_BAHR_BRIEF.md .gitignore gazebo ros2/topic_map docs/design docs/plans
 git commit -m "$(cat <<'EOF'
  reframes AVL Autonomy Sim as Gazebo-first with Isaac optional.
 

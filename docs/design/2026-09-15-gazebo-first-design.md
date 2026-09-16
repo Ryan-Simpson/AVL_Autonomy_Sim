@@ -106,9 +106,9 @@ AVL_Autonomy_Sim/
 ├── docs/
 │   ├── FALL_2026_BAHR_BRIEF.md
 │   ├── ISAAC_RESEARCH_MAP.md
-│   └── superpowers/
-│       ├── specs/
-│       └── plans/
+│   ├── context_meetings/
+│   ├── design/
+│   └── plans/
 └── README.md
 ```
 
