@@ -35,6 +35,7 @@ Plan: [docs/superpowers/plans/2026-09-15-gazebo-first-closed-loop.md](docs/super
 | Isaac Sim as optional second backend | Perfect track–soil physics |
 
 Fall 2026 deliverables: [docs/FALL_2026_BAHR_BRIEF.md](docs/FALL_2026_BAHR_BRIEF.md).  
+Team context / notes (Drive + GitHub): [docs/context_meetings/](docs/context_meetings/).  
 Isaac literature (Phase 4): [docs/ISAAC_RESEARCH_MAP.md](docs/ISAAC_RESEARCH_MAP.md).  
 GitHub push steps: [docs/GIT_PUSH.md](docs/GIT_PUSH.md).
 
