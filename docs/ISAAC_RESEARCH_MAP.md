@@ -1,7 +1,8 @@
 # AVL Autonomy Sim — Isaac research map
 
 Prepared for AVL (Autonomous Vehicles Lab), Cal Poly Pomona.  
-**This repo:** `AVL_Autonomy_Sim` — Isaac twin platform. First vehicle pack is the lab’s IGVC tracked rover.  
+**This repo:** `AVL_Autonomy_Sim` — Gazebo-first ROS 2 twin; **Isaac Sim is optional Phase 4** on the same frozen topic map. First vehicle pack is the lab’s IGVC tracked rover (MARVIN).  
+**This doc:** literature and people map for when/if the team reaches Isaac — not the Fall primary backend.  
 **Not this repo:** Chrono `avl_simulator` (student / offline API).
 
 Purpose: who already built ground-robot work in Isaac Sim, what to steal, what not to build.
@@ -10,7 +11,7 @@ Purpose: who already built ground-robot work in Isaac Sim, what to steal, what n
 
 ## 1. Where this product sits
 
-Isaac is three worlds. AVL Autonomy Sim is **World 1**, aiming at **World 3**. Do not wander into World 2.
+Isaac is three worlds. When AVL Autonomy Sim reaches Isaac, it is **World 1**, aiming at **World 3**. Do not wander into World 2. Fall primary work stays on Gazebo.
 
 | World | What it is | AVL Autonomy Sim |
 |-------|------------|------------------|

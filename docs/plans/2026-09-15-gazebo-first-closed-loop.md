@@ -20,7 +20,7 @@
 
 ---
 
-### Task 1: Repo reframe (docs + layout)
+### Task 1: Repo reframe (docs + layout) — DONE (2026-09-15)
 
 **Files:**
 - Modify: `README.md`
@@ -35,61 +35,15 @@
 - Consumes: design spec goals and discipline
 - Produces: public repo story = Gazebo primary / Isaac optional; empty topic map schema for Task 2
 
-- [ ] **Step 1: Rewrite README abstract and scope** for Gazebo-first + frozen topic contract + C++ hinge; keep vehicle/sensor list and “not Chrono” line.
+- [x] **Step 1: Rewrite README abstract and scope** for Gazebo-first + frozen topic contract + C++ hinge; keep vehicle/sensor list and “not Chrono” line.
 
-- [ ] **Step 2: Update Fall brief** deliverables to D1 Gazebo closed loop, D2 topic map freeze, D3 VLP-16 figure, D4 poster, D5 paper; Isaac as stretch.
+- [x] **Step 2: Update Fall brief** deliverables to D1 Gazebo closed loop, D2 topic map freeze, D3 VLP-16 figure, D4 poster, D5 paper; Isaac as stretch.
 
-- [ ] **Step 3: Extend `.gitignore`** for `build/`, `install/`, `log/`, `*.pcd`, Gazebo cache, `compile_commands.json`.
+- [x] **Step 3: Extend `.gitignore`** for `build/`, `install/`, `log/`, `*.pcd`, Gazebo cache, `compile_commands.json`.
 
-- [ ] **Step 4: Add topic map stubs**
+- [x] **Step 4: Add topic map stubs** (`ros2/topic_map/topics.yaml`, `TOPICS.md`).
 
-Create `ros2/topic_map/topics.yaml`:
-
-```yaml
-# STATUS: draft — freeze only after Jetson inventory (Task 2)
-version: 0
-status: draft
-frame_ids:
-  map: map
-  odom: odom
-  base_link: base_link
-topics:
-  cmd_vel:
-    name: /cmd_vel
-    type: geometry_msgs/msg/Twist
-    direction: subscribe  # sim subscribes; autonomy publishes
-  odom:
-    name: /odom
-    type: nav_msgs/msg/Odometry
-    direction: publish
-  imu:
-    name: /imu/data
-    type: sensor_msgs/msg/Imu
-    direction: publish
-  gps:
-    name: /gps/fix
-    type: sensor_msgs/msg/NavSatFix
-    direction: publish
-  lidar:
-    name: /velodyne_points
-    type: sensor_msgs/msg/PointCloud2
-    direction: publish
-```
-
-Create `ros2/topic_map/TOPICS.md` explaining draft vs frozen and Jetson-wins rule.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add README.md docs/FALL_2026_BAHR_BRIEF.md .gitignore gazebo ros2/topic_map docs/design docs/plans
-git commit -m "$(cat <<'EOF'
- reframes AVL Autonomy Sim as Gazebo-first with Isaac optional.
-
-Aligns README and Fall brief with closed-loop topic parity, C++ hinge,
-and VLP-16 eval; adds topic map stubs for team inventory.
-EOF
-)"
-```
+- [x] **Step 5: Commit** Gazebo-first reframe to `main`.
 
 ---
 
