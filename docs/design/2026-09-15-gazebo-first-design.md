@@ -2,7 +2,8 @@
 
 **Date:** 2026-09-15  
 **Status:** Approved direction for team start  
-**Product:** AVL Autonomy Sim (Cal Poly Pomona AVL)
+**Product:** AVL Autonomy Sim (Cal Poly Pomona AVL)  
+**Primary sim:** Gazebo Fortress (`gz sim`) + `ros-humble-ros-gz` on Ubuntu 22.04 / ROS 2 Humble. Not Gazebo Classic. Not Harmonic.
 
 ## Problem
 

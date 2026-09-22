@@ -34,6 +34,10 @@ logs/
 .ignition/
 .gz/
 
+# Living task sheets (Drive / local only — not the repo)
+docs/plans/*-assignments.md
+docs/plans/*-assignments.pdf
+
 # OS / editor
 .DS_Store
 Thumbs.db

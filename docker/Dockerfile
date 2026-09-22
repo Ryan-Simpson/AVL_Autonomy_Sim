@@ -51,8 +51,8 @@ RUN if getent group ${GID} >/dev/null; then \
  && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
  && chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# LAYER 3: runtime env. Fortress reads IGN_GAZEBO_RESOURCE_PATH;
-# GZ_SIM_RESOURCE_PATH is the Harmonic name, set too for future-proofing.
+# LAYER 3: runtime env. Fortress uses IGN_GAZEBO_RESOURCE_PATH.
+# Also set GZ_SIM_RESOURCE_PATH (newer Gazebo Sim env name) so both resolve.
 ENV NVIDIA_VISIBLE_DEVICES=all \
     NVIDIA_DRIVER_CAPABILITIES=all \
     QT_X11_NO_MITSHM=1 \

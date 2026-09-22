@@ -6,7 +6,7 @@
 
 **Architecture:** ROS 2 topic contract is the product; Gazebo is the required backend; Isaac is optional on the same contract. Vehicle pack is the IGVC tracked rover (skid-steer approximation). Primary code in `rclcpp` / Gazebo C++ plugins.
 
-**Tech Stack:** ROS 2 Humble, Gazebo (Harmonic preferred with Humble via `ros_gz`), C++17, `rclcpp`, `sensor_msgs` / `nav_msgs` / `geometry_msgs`, URDF/xacro, optional Isaac Sim later.
+**Tech Stack:** ROS 2 Humble, Gazebo Fortress (`gz sim`) + `ros-humble-ros-gz`, C++17, `rclcpp`, `sensor_msgs` / `nav_msgs` / `geometry_msgs`, URDF/xacro, optional Isaac Sim later.
 
 **Spec:** [docs/design/2026-09-15-gazebo-first-design.md](../design/2026-09-15-gazebo-first-design.md)
 
@@ -133,7 +133,7 @@ EOF
 
 - [ ] **Step 2: Bringup launch** that starts Gazebo, spawns rover, starts `ros_gz_bridge` parameter_bridge mappings from `topics.yaml` (`cmd_vel`, `odom`; clock if needed).
 
-Example bridge param sketch (adjust to exact Humble/Harmonic syntax):
+Example bridge param sketch (adjust to exact Humble/Fortress syntax):
 
 ```yaml
 - ros_topic_name: "/cmd_vel"

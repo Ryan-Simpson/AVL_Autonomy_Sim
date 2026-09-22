@@ -57,7 +57,7 @@ AVL_Autonomy_Sim/
 ## Requirements (planned)
 
 - ROS 2 Humble  
-- Gazebo (Harmonic via `ros_gz` preferred)  
+- Gazebo Fortress (`gz sim`) + `ros-humble-ros-gz`  
 - C++17 toolchain (`colcon`, `rclcpp`)  
 - Isaac Sim on an RTX workstation — **optional**, after closed loop  
 - Python only where launch/tooling or Isaac requires it  
