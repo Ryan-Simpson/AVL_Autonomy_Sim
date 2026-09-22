@@ -1,0 +1,8 @@
+.git
+build/
+install/
+log/
+**/__pycache__/
+*.bag
+*.db3
+*.mcap

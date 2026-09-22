@@ -1,0 +1,46 @@
+services:
+  sim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: humble
+        UID: "${HOST_UID:-1000}"
+        GID: "${HOST_GID:-1000}"
+    image: avl/autonomy-sim:humble
+    container_name: avl-sim
+    stdin_open: true
+    tty: true
+    network_mode: host
+    ipc: host
+    shm_size: "2gb"
+    environment:
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=/tmp/.docker.xauth
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      # Force EGL (headless sensor rendering: gpu_lidar, cameras) onto the
+      # NVIDIA driver instead of Mesa, which fails with no /dev/dri.
+      - __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - ../:/ws/src/AVL_Autonomy_Sim:rw
+      - build-cache:/ws/build
+      - install-cache:/ws/install
+      - home-cache:/home/avl
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  build-cache:
+  install-cache:
+  home-cache:
