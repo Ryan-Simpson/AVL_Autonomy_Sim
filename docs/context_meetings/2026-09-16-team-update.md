@@ -34,7 +34,7 @@ Watch these two videos before we start building. They explain what ROS and Gazeb
 2. **Simulating Robots with Gazebo and ROS** (Articulated Robotics): https://www.youtube.com/watch?v=laWn7_cj434  
    Covers what a simulator does, how a robot model gets into Gazebo, and how Gazebo talks to ROS.
 
-> **Note:** These videos use ROS 2 Foxy and Gazebo Classic. The ideas are the same for us, but some commands are different. We use ROS 2 Humble with **Gazebo Fortress** (`gz sim`, `ros-humble-ros-gz`), so follow our repo for the actual setup commands.
+> **Note:** These videos use ROS 2 Foxy and Gazebo Classic. The ideas are the same for us, but some commands are different. We use ROS 2 Humble with **Gazebo Fortress** (`ign gazebo`, `ros-humble-ros-gz`), so follow our repo for the actual setup commands.
 
 ## Action items
 

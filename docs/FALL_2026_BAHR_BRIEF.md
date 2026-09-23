@@ -1,7 +1,7 @@
 # AVL Autonomy Sim — Fall 2026 Research Brief
 
 **For:** Dr. Behnam Bahr, Autonomous Vehicles Lab  
-**Platform:** Gazebo Fortress (`gz sim`) + ROS 2 Humble (C++ hinge); NVIDIA Isaac Sim optional  
+**Platform:** Gazebo Fortress (`ign gazebo`) + ROS 2 Humble (C++ hinge); NVIDIA Isaac Sim optional  
 **Product:** AVL Autonomy Sim  
 **First vehicle pack:** IGVC tracked rover (tank treads, skid-steer approximation)
 
