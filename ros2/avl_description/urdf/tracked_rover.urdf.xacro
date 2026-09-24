@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!--
+  Tracked rover for AVL Autonomy Sim.
+
+  Chassis and sensor mounts copied from Paarseus/IGVC_ROS2
+  src/avros_bringup/urdf/avros.urdf.xacro (Parsa Ghasemi, MIT).
+  That file credits a 2026-05-06 resurvey in cpp_avl_igvc/igvc_description.
+
+  Changes here:
+  - ZED X links are boxes at the same mount poses. The original includes
+    $(find zed_wrapper), which is not installed in this workspace.
+  - No wheel joints. This file is the rigid body only. Diff-drive comes later.
+  - Mass 150 kg and several mounts are still marked TODO in the source.
+    Do not treat them as assets/measurements.md.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="tracked_rover">
+
+  <!-- IMU height above ground. Source comment: 21.875 in. -->
+  <xacro:property name="xsens_height" value="0.5556"/>
+
+  <!-- Main chassis box: 29.25 x 26.75 x 14.75 in -->
+  <xacro:property name="main_length" value="0.7430"/>
+  <xacro:property name="main_width"  value="0.6795"/>
+  <xacro:property name="main_height" value="0.3747"/>
+
+  <!-- Top sensor platform: 23.00 x 22.50 x 5.75 in -->
+  <xacro:property name="top_length" value="0.5842"/>
+  <xacro:property name="top_width"  value="0.5715"/>
+  <xacro:property name="top_height" value="0.1461"/>
+
+  <!-- Tread enclosures: 32.5 x 3.5 x 5.5 in, centered ±0.3653 m off centerline -->
+  <xacro:property name="tread_length" value="0.8255"/>
+  <xacro:property name="tread_width"  value="0.0889"/>
+  <xacro:property name="tread_height" value="0.1397"/>
+  <xacro:property name="tread_y"      value="0.3653"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.3143 0 ${xsens_height - 0.2191}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${main_length} ${main_width} ${main_height}"/>
+      </geometry>
+      <material name="grey"><color rgba="0.55 0.55 0.55 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.3143 0 ${xsens_height - 0.2191}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${main_length} ${main_width} ${main_height}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.1143 0 ${xsens_height + 0.0413}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${top_length} ${top_width} ${top_height}"/>
+      </geometry>
+      <material name="light_grey"><color rgba="0.70 0.70 0.70 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.1143 0 ${xsens_height + 0.0413}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${top_length} ${top_width} ${top_height}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.3143 ${tread_y} ${xsens_height - 0.4763}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${tread_length} ${tread_width} ${tread_height}"/>
+      </geometry>
+      <material name="dark_grey"><color rgba="0.25 0.25 0.25 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.3143 ${tread_y} ${xsens_height - 0.4763}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${tread_length} ${tread_width} ${tread_height}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.3143 ${-tread_y} ${xsens_height - 0.4763}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${tread_length} ${tread_width} ${tread_height}"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0.3143 ${-tread_y} ${xsens_height - 0.4763}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${tread_length} ${tread_width} ${tread_height}"/>
+      </geometry>
+    </collision>
+    <!-- Source placeholder, not a measured mass. -->
+    <inertial>
+      <mass value="150.0"/>
+      <inertia ixx="10.0" ixy="0" ixz="0" iyy="20.0" iyz="0" izz="25.0"/>
+    </inertial>
+  </link>
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TODO measure: source says sketch 2026-04-25, chassis center. -->
+  <link name="imu_link">
+    <visual>
+      <geometry><box size="0.06 0.06 0.03"/></geometry>
+      <material name="blue"><color rgba="0 0 0.8 1"/></material>
+    </visual>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 ${xsens_height}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TODO measure: source sketch, 3.5 in forward and 6.25 in up from the Xsens. -->
+  <link name="velodyne">
+    <visual>
+      <geometry><cylinder radius="0.052" length="0.072"/></geometry>
+      <material name="velodyne_grey"><color rgba="0.3 0.3 0.3 1"/></material>
+    </visual>
+  </link>
+  <joint name="velodyne_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="velodyne"/>
+    <origin xyz="0.089 0.0 ${xsens_height + 0.159}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Camera boxes stand in for zed_wrapper's zed_macro. Mounts match the source. -->
+  <link name="zed_front_camera_link">
+    <visual>
+      <geometry><box size="0.04 0.17 0.03"/></geometry>
+      <material name="zed_black"><color rgba="0.1 0.1 0.1 1"/></material>
+    </visual>
+  </link>
+  <joint name="zed_front_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="zed_front_camera_link"/>
+    <!-- Resurvey 2026-05-06: 26.75 in forward, 4.25 in below IMU. Pitch 15 deg down. -->
+    <origin xyz="0.6795 0.0 ${xsens_height - 0.108}" rpy="0 ${radians(15)} 0"/>
+  </joint>
+
+  <link name="zed_left_camera_link">
+    <visual>
+      <geometry><box size="0.04 0.17 0.03"/></geometry>
+      <material name="zed_black"/>
+    </visual>
+  </link>
+  <joint name="zed_left_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="zed_left_camera_link"/>
+    <origin xyz="0.098 0.286 ${xsens_height + 0.057}" rpy="0 0 1.5708"/>
+  </joint>
+
+  <link name="zed_right_camera_link">
+    <visual>
+      <geometry><box size="0.04 0.17 0.03"/></geometry>
+      <material name="zed_black"/>
+    </visual>
+  </link>
+  <joint name="zed_right_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="zed_right_camera_link"/>
+    <origin xyz="0.098 -0.286 ${xsens_height + 0.057}" rpy="0 0 -1.5708"/>
+  </joint>
+
+</robot>
