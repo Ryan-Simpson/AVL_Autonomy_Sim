@@ -1,0 +1,37 @@
+<sdf version="1.8">
+  <world name="empty_course">
+    <physics name="physics" type="ignored">
+      <max_step_size>0.001</max_step_size>
+    </physics>
+
+    <gravity>0 0 -9.8</gravity>
+k
+<include>
+ <uri>model://ground_plane</uri>
+<include>
+
+  </world>
+
+<model: name: "box1">
+	<static>true</static>
+	<pose> 2 0 0.5 0 0 0</pose>
+
+<link name= "link">
+<collision name = "collision">
+	<geometry>
+	<box>
+	 <size>1 1 1</size>
+	</box>
+	</geometry>
+	</colision>
+
+	<visual name ="visual"> 
+	<geometry>
+	<box>
+	 <size>1 1 1</size>
+	</box> 
+	</geometry> 
+	</visual>
+	</link>
+	</model>
+</sdf>
