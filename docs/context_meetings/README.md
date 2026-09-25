@@ -7,6 +7,7 @@ Team updates and context notes live here so GitHub matches the autonomy team Goo
 
 | Date | Notes | Drive doc |
 |------|-------|-----------|
+| 2026-09-24 | [IGVC rover in Fortress](2026-09-24-igvc-rover-in-fortress.md) | not on Drive yet |
 | 2026-09-16 | [Team update / Gazebo first](2026-09-16-team-update.md) | `AVLAS_09-16_TeamUpdate` (and related) |
 
 Workflow: edit in Drive during/after the meeting → paste or export into a new file here → commit with the rest of the repo.
