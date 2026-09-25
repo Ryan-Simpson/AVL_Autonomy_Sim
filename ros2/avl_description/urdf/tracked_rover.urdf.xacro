@@ -2,16 +2,12 @@
 <!--
   Tracked rover for AVL Autonomy Sim.
 
-  Chassis and sensor mounts copied from Paarseus/IGVC_ROS2
+  Chassis geometry came from Paarseus/IGVC_ROS2
   src/avros_bringup/urdf/avros.urdf.xacro (Parsa Ghasemi, MIT).
-  That file credits a 2026-05-06 resurvey in cpp_avl_igvc/igvc_description.
 
-  Changes here:
-  - ZED X links are boxes at the same mount poses. The original includes
-    $(find zed_wrapper), which is not installed in this workspace.
-  - No wheel joints. This file is the rigid body only. Diff-drive comes later.
-  - Mass 150 kg and several mounts are still marked TODO in the source.
-    Do not treat them as assets/measurements.md.
+  Sensor frame names follow assets/urdf/frames.md. Mount transforms stay at
+  0 0 0 until they are measured and recorded in assets/measurements.md.
+  ZED optical frames use the normal ROS optical-frame orientation.
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="tracked_rover">
 
@@ -89,7 +85,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <!-- TODO measure: source says sketch 2026-04-25, chassis center. -->
+  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
   <link name="imu_link">
     <visual>
       <geometry><box size="0.06 0.06 0.03"/></geometry>
@@ -99,10 +95,10 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 ${xsens_height}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <!-- TODO measure: source sketch, 3.5 in forward and 6.25 in up from the Xsens. -->
+  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
   <link name="velodyne">
     <visual>
       <geometry><cylinder radius="0.052" length="0.072"/></geometry>
@@ -112,45 +108,77 @@
   <joint name="velodyne_joint" type="fixed">
     <parent link="base_link"/>
     <child link="velodyne"/>
-    <origin xyz="0.089 0.0 ${xsens_height + 0.159}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <!-- Camera boxes stand in for zed_wrapper's zed_macro. Mounts match the source. -->
-  <link name="zed_front_camera_link">
+  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
+  <link name="gps_link"/>
+  <joint name="gps_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="gps_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Camera boxes stand in for zed_wrapper's zed_macro. -->
+  <link name="zed_center_link">
     <visual>
       <geometry><box size="0.04 0.17 0.03"/></geometry>
       <material name="zed_black"><color rgba="0.1 0.1 0.1 1"/></material>
     </visual>
   </link>
-  <joint name="zed_front_mount_joint" type="fixed">
+  <joint name="zed_center_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="zed_front_camera_link"/>
-    <!-- Resurvey 2026-05-06: 26.75 in forward, 4.25 in below IMU. Pitch 15 deg down. -->
-    <origin xyz="0.6795 0.0 ${xsens_height - 0.108}" rpy="0 ${radians(15)} 0"/>
+    <child link="zed_center_link"/>
+    <!-- TODO measure -->
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <link name="zed_left_camera_link">
+  <link name="zed_left_link">
     <visual>
       <geometry><box size="0.04 0.17 0.03"/></geometry>
       <material name="zed_black"/>
     </visual>
   </link>
-  <joint name="zed_left_mount_joint" type="fixed">
+  <joint name="zed_left_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="zed_left_camera_link"/>
-    <origin xyz="0.098 0.286 ${xsens_height + 0.057}" rpy="0 0 1.5708"/>
+    <child link="zed_left_link"/>
+    <!-- TODO measure -->
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <link name="zed_right_camera_link">
+  <link name="zed_right_link">
     <visual>
       <geometry><box size="0.04 0.17 0.03"/></geometry>
       <material name="zed_black"/>
     </visual>
   </link>
-  <joint name="zed_right_mount_joint" type="fixed">
+  <joint name="zed_right_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="zed_right_camera_link"/>
-    <origin xyz="0.098 -0.286 ${xsens_height + 0.057}" rpy="0 0 -1.5708"/>
+    <child link="zed_right_link"/>
+    <!-- TODO measure -->
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Optical frames: x right, y down, z forward. -->
+  <link name="zed_left_optical_frame"/>
+  <joint name="zed_left_optical_joint" type="fixed">
+    <parent link="zed_left_link"/>
+    <child link="zed_left_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+  </joint>
+
+  <link name="zed_center_optical_frame"/>
+  <joint name="zed_center_optical_joint" type="fixed">
+    <parent link="zed_center_link"/>
+    <child link="zed_center_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+  </joint>
+
+  <link name="zed_right_optical_frame"/>
+  <joint name="zed_right_optical_joint" type="fixed">
+    <parent link="zed_right_link"/>
+    <child link="zed_right_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
   </joint>
 
   <!-- Track stand-ins. Separation is the surveyed tread centerline spacing. -->
