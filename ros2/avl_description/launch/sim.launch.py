@@ -4,7 +4,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
@@ -49,6 +49,26 @@ def generate_launch_description():
                 '-topic', 'robot_description',
                 '-z', '0.05',
             ],
+            output='screen',
+        ),
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            arguments=[
+                '/model/tracked_rover/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
+            ],
+            output='screen',
+        ),
+        # IGVC teleop publishes /cmd_vel. Diff-drive listens on the model topic.
+        ExecuteProcess(
+            cmd=['/usr/bin/python3.12', '-c',
+                 'import rclpy\n'
+                 'from geometry_msgs.msg import Twist\n'
+                 'rclpy.init()\n'
+                 'n = rclpy.create_node("cmd_vel_relay")\n'
+                 'p = n.create_publisher(Twist, "/model/tracked_rover/cmd_vel", 10)\n'
+                 'n.create_subscription(Twist, "/cmd_vel", lambda m: p.publish(m), 10)\n'
+                 'rclpy.spin(n)\n'],
             output='screen',
         ),
     ])
