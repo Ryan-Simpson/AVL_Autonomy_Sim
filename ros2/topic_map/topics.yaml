@@ -1,28 +1,128 @@
-# STATUS: draft — freeze only after Jetson inventory
-version: 0
-status: draft
+# Topic contract taken from Paarseus/IGVC_ROS2 configs (the stack that ran
+# at IGVC, Oakland University). Names below are what that repo publishes and
+# subscribes. A live `ros2 topic list` on the Jetson can still correct a name;
+# until then the sim uses these.
+version: 1
+status: adopted
+source: https://github.com/Paarseus/IGVC_ROS2
 frame_ids:
   map: map
   odom: odom
   base_link: base_link
+  imu: imu_link
+  lidar: velodyne
+  gps: gps_link
+  zed_front: zed_center_link
+  zed_left: zed_left_link
+  zed_right: zed_right_link
 topics:
   cmd_vel:
     name: /cmd_vel
     type: geometry_msgs/msg/Twist
     direction: subscribe
-  odom:
-    name: /odom
+    notes: Autonomy commands. Actuator node subscribes.
+  wheel_odom:
+    name: /wheel_odom
     type: nav_msgs/msg/Odometry
     direction: publish
+    frame_id: odom
+    child_frame_id: base_link
+    notes: Raw track odometry from the actuator, about 50 Hz. Sim diff-drive publishes this.
+  odom_filtered:
+    name: /odometry/filtered
+    type: nav_msgs/msg/Odometry
+    direction: publish
+    frame_id: odom
+    child_frame_id: base_link
+    notes: Local EKF output. Nav2 and the actuator use this, and it is the odom to base_link broadcaster.
   imu:
     name: /imu/data
     type: sensor_msgs/msg/Imu
     direction: publish
-  gps:
-    name: /gps/fix
+    frame_id: imu_link
+    notes: Xsens, about 100 Hz.
+  gnss:
+    name: /gnss
     type: sensor_msgs/msg/NavSatFix
     direction: publish
+    frame_id: gps_link
+    notes: This stack uses /gnss, not /gps/fix.
+  gps_odom:
+    name: /odometry/gps
+    type: nav_msgs/msg/Odometry
+    direction: publish
+    notes: navsat_transform output, GPS in meters.
+  nmea:
+    name: /nmea
+    type: nmea_msgs/msg/Sentence
+    direction: publish
+    notes: Raw NMEA sentence the GNSS driver is remapped onto.
+  rtcm:
+    name: /rtcm
+    type: rtcm_msgs/msg/Message
+    direction: publish
+    notes: RTCM corrections the GNSS driver is remapped onto.
   lidar:
     name: /velodyne_points
     type: sensor_msgs/msg/PointCloud2
     direction: publish
+    frame_id: velodyne
+    notes: VLP-16, about 10 Hz.
+  zed_front_image:
+    name: /zed_front/zed_node/rgb/image_rect_color
+    type: sensor_msgs/msg/Image
+    direction: publish
+    frame_id: zed_center_optical_frame
+    notes: Front camera. The URDF link is zed_center_link. Perception yaml also mentions /zed_front/zed_node/rgb/color/rect/image.
+  zed_front_cloud:
+    name: /zed_front/zed_node/point_cloud/cloud_registered
+    type: sensor_msgs/msg/PointCloud2
+    direction: publish
+  zed_front_odom:
+    name: /zed_front/zed_node/odom
+    type: nav_msgs/msg/Odometry
+    direction: publish
+    notes: Front VIO. EKF uses yaw only.
+  zed_left_image:
+    name: /zed_left/zed_node/rgb/image_rect_color
+    type: sensor_msgs/msg/Image
+    direction: publish
+    frame_id: zed_left_optical_frame
+  zed_left_cloud:
+    name: /zed_left/zed_node/point_cloud/cloud_registered
+    type: sensor_msgs/msg/PointCloud2
+    direction: publish
+  zed_left_odom:
+    name: /zed_left/zed_node/odom
+    type: nav_msgs/msg/Odometry
+    direction: publish
+  zed_right_image:
+    name: /zed_right/zed_node/rgb/image_rect_color
+    type: sensor_msgs/msg/Image
+    direction: publish
+    frame_id: zed_right_optical_frame
+  zed_right_cloud:
+    name: /zed_right/zed_node/point_cloud/cloud_registered
+    type: sensor_msgs/msg/PointCloud2
+    direction: publish
+  zed_right_odom:
+    name: /zed_right/zed_node/odom
+    type: nav_msgs/msg/Odometry
+    direction: publish
+  actuator_state:
+    name: /avros/actuator_state
+    type: avros_msgs/msg/ActuatorState
+    direction: publish
+    notes: About 20 Hz from the actuator node.
+  actuator_command:
+    name: /avros/actuator_command
+    type: avros_msgs/msg/ActuatorCommand
+    direction: subscribe
+  wheel_debug:
+    name: /avros/wheel_debug
+    type: avros_msgs/msg/WheelDebug
+    direction: publish
+  autonomous_mode:
+    name: /autonomous_mode
+    type: std_msgs/msg/Bool
+    direction: subscribe

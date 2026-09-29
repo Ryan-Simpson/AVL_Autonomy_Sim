@@ -5,8 +5,9 @@
   Chassis geometry came from Paarseus/IGVC_ROS2
   src/avros_bringup/urdf/avros.urdf.xacro (Parsa Ghasemi, MIT).
 
-  Sensor frame names follow assets/urdf/frames.md. Mount transforms stay at
-  0 0 0 until they are measured and recorded in assets/measurements.md.
+  Sensor frame names follow assets/urdf/frames.md.
+  Mount numbers below are IGVC stand-ins (avros.urdf.xacro / avros_cam_sim),
+  except gps_link, which is still 0 0 0. Mass is 49 kg.
   ZED optical frames use the normal ROS optical-frame orientation.
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="tracked_rover">
@@ -71,10 +72,11 @@
       </geometry>
       <material name="dark_grey"/>
     </visual>
-    <!-- Source placeholder, not a measured mass. -->
+    <!-- Whole robot is 49 kg. Four wheels are 1 kg each, so this link is 45 kg.
+         Inertia is the IGVC placeholder scaled by 45/150, not a CAD inertia. -->
     <inertial>
-      <mass value="150.0"/>
-      <inertia ixx="10.0" ixy="0" ixz="0" iyy="20.0" iyz="0" izz="25.0"/>
+      <mass value="45.0"/>
+      <inertia ixx="3.0" ixy="0" ixz="0" iyy="6.0" iyz="0" izz="7.5"/>
     </inertial>
   </link>
 
@@ -85,7 +87,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
+  <!-- IGVC stand-in from avros_cam_sim / avros.urdf.xacro. Not a measurements.md value. -->
   <link name="imu_link">
     <visual>
       <geometry><box size="0.06 0.06 0.03"/></geometry>
@@ -95,10 +97,10 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 ${xsens_height}" rpy="0 0 0"/>
   </joint>
 
-  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
+  <!-- IGVC stand-in: 3.5 in forward and 6.25 in above the IMU. Not a measurements.md value. -->
   <link name="velodyne">
     <visual>
       <geometry><cylinder radius="0.052" length="0.072"/></geometry>
@@ -108,15 +110,21 @@
   <joint name="velodyne_joint" type="fixed">
     <parent link="base_link"/>
     <child link="velodyne"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0.089 0 ${xsens_height + 0.159}" rpy="0 0 0"/>
   </joint>
 
-  <!-- TODO measure: replace the zero mount from assets/measurements.md. -->
-  <link name="gps_link"/>
+  <!-- On the roof of the main chassis, in line with the front camera. Not a tape measurement.
+       Roof height is the main-box center plus half its height. -->
+  <link name="gps_link">
+    <visual>
+      <geometry><box size="0.08 0.08 0.02"/></geometry>
+      <material name="gps_green"><color rgba="0.1 0.6 0.2 1"/></material>
+    </visual>
+  </link>
   <joint name="gps_joint" type="fixed">
     <parent link="base_link"/>
     <child link="gps_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0.6795 0 ${xsens_height - 0.2191 + main_height / 2 + 0.01}" rpy="0 0 0"/>
   </joint>
 
   <!-- Camera boxes stand in for zed_wrapper's zed_macro. -->
@@ -129,8 +137,8 @@
   <joint name="zed_center_joint" type="fixed">
     <parent link="base_link"/>
     <child link="zed_center_link"/>
-    <!-- TODO measure -->
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <!-- IGVC stand-in. avros_cam_sim calls this zed_front. 15 deg down. -->
+    <origin xyz="0.6795 0 ${xsens_height - 0.108}" rpy="0 ${radians(15)} 0"/>
   </joint>
 
   <link name="zed_left_link">
@@ -142,8 +150,8 @@
   <joint name="zed_left_joint" type="fixed">
     <parent link="base_link"/>
     <child link="zed_left_link"/>
-    <!-- TODO measure -->
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <!-- IGVC stand-in. Faces left. -->
+    <origin xyz="0.098 0.286 ${xsens_height + 0.057}" rpy="0 0 1.5708"/>
   </joint>
 
   <link name="zed_right_link">
@@ -155,8 +163,8 @@
   <joint name="zed_right_joint" type="fixed">
     <parent link="base_link"/>
     <child link="zed_right_link"/>
-    <!-- TODO measure -->
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <!-- IGVC stand-in. Faces right. -->
+    <origin xyz="0.098 -0.286 ${xsens_height + 0.057}" rpy="0 0 -1.5708"/>
   </joint>
 
   <!-- Optical frames: x right, y down, z forward. -->
@@ -201,7 +209,7 @@
         </geometry>
       </collision>
       <inertial>
-        <mass value="2.0"/>
+        <mass value="1.0"/>
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
       </inertial>
     </link>

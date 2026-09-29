@@ -1,0 +1,15 @@
+orange_igvc course model
+Copyright Hosei University Autonomous Robotics Lab (Orange)
+
+Source: https://github.com/KBKN-Autonomous-Robotics-Lab/orange_ros2
+Path: orange_gazebo/models/orange_igvc and orange_gazebo/worlds/orange_igvc.world
+License: Apache License 2.0
+
+This copy keeps the course geometry, painted ground texture, and barrel mesh.
+The barrel diffuse and specular images are from osrf/gazebo_models
+(construction_barrel, Apache-2.0); Hosei's world referenced them but did
+not ship the image files.
+Gazebo Classic material scripts were replaced with Fortress colors and a PBR
+albedo map so `ign gazebo` can load the world. The model is included from
+gazebo/worlds/igvc_course.sdf at the same pose the Orange launch used
+(0 16.3 0).
