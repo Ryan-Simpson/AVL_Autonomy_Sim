@@ -1,0 +1,48 @@
+name: Fortress closed loop
+on:
+  push:
+    branches: [main, 'suhas/fortress-closed-loop-*']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  closed-loop:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    container: osrf/ros:humble-desktop
+    env:
+      ROS_DOMAIN_ID: '42'
+      ROS_LOCALHOST_ONLY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Fortress and test dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ros-humble-ros-gz ros-humble-xacro ros-humble-robot-state-publisher ros-humble-ament-cmake-pytest python3-colcon-common-extensions python3-pytest python3-yaml
+      - name: Build and test adopted interfaces
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build --packages-select avl_description
+          source install/setup.bash
+          colcon test --packages-select avl_description --event-handlers console_direct+
+          colcon test-result --verbose
+          ros2 launch avl_description sim.launch.py --show-args
+      - name: Verify command to simulated motion
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
+          mkdir -p artifacts
+          timeout --signal=TERM --kill-after=5s 100s ros2 launch avl_description sim.launch.py gui:=false > artifacts/sim.log 2>&1 &
+          sim_pid=$!
+          trap 'kill -TERM "$sim_pid" 2>/dev/null || true; wait "$sim_pid" || true' EXIT
+          timeout --signal=TERM --kill-after=5s 75s ros2 run avl_description check_closed_loop.py --drive-sim --timeout 60 | tee artifacts/closed-loop.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fortress-verification
+          path: |
+            artifacts/
+            log/latest_test/

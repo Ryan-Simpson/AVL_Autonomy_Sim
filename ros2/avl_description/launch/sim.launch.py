@@ -6,12 +6,12 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
-    ExecuteProcess,
     IncludeLaunchDescription,
     SetEnvironmentVariable,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -29,6 +29,8 @@ def generate_launch_description():
 
     robot_description = ParameterValue(
         Command(['xacro ', xacro_path]), value_type=str)
+    server_flag = PythonExpression([
+        "'' if '", LaunchConfiguration('gui'), "' == 'true' else '-s '"])
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -36,12 +38,16 @@ def generate_launch_description():
                 get_package_share_directory('ros_gz_sim'),
                 'launch', 'gz_sim.launch.py')),
         launch_arguments={
-            'gz_args': ['-r ', world],
+            'gz_args': ['-r ', server_flag, world],
         }.items(),
     )
 
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
+        DeclareLaunchArgument('gui', default_value='true', choices=['true', 'false']),
+        DeclareLaunchArgument(
+            'publish_odom_tf', default_value='true', choices=['true', 'false'],
+            description='Disable when the local EKF owns odom -> base_link.'),
         SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', resource_path),
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', resource_path),
         gz_sim,
@@ -50,7 +56,8 @@ def generate_launch_description():
             executable='robot_state_publisher',
             parameters=[{
                 'robot_description': robot_description,
-                'use_sim_time': LaunchConfiguration('use_sim_time'),
+                'use_sim_time': ParameterValue(
+                    LaunchConfiguration('use_sim_time'), value_type=bool),
             }],
         ),
         Node(
@@ -70,21 +77,19 @@ def generate_launch_description():
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
-            arguments=[
-                '/model/tracked_rover/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
-            ],
+            name='gazebo_bridge',
+            parameters=[{'config_file': os.path.join(pkg, 'config', 'bridge.yaml')}],
             output='screen',
         ),
-        # IGVC teleop publishes /cmd_vel. Diff-drive listens on the model topic.
-        ExecuteProcess(
-            cmd=['/usr/bin/python3.12', '-c',
-                 'import rclpy\n'
-                 'from geometry_msgs.msg import Twist\n'
-                 'rclpy.init()\n'
-                 'n = rclpy.create_node("cmd_vel_relay")\n'
-                 'p = n.create_publisher(Twist, "/model/tracked_rover/cmd_vel", 10)\n'
-                 'n.create_subscription(Twist, "/cmd_vel", lambda m: p.publish(m), 10)\n'
-                 'rclpy.spin(n)\n'],
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='gazebo_odom_tf_bridge',
+            condition=IfCondition(LaunchConfiguration('publish_odom_tf')),
+            arguments=[
+                '/model/tracked_rover/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
+            ],
+            remappings=[('/model/tracked_rover/tf', '/tf')],
             output='screen',
         ),
     ])

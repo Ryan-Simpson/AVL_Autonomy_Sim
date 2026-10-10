@@ -43,6 +43,20 @@ The names in `topics.yaml` are the IGVC stack. This sheet is what still needs a 
 
 ## Checking it on the Jetson
 
+With the normal MARVIN stack running, collect all 22 adopted interfaces in one
+read-only pass from the repository root:
+
+```bash
+python3 tools/capture_jetson_inventory.py --output artifacts/jetson-inventory.json
+```
+
+This records endpoint/QoS information, bounded rate samples, available frame
+headers, and odometry child frames. An absent topic is marked `seen=false`;
+a timeout is preserved as a timeout, never filled in with an assumed value.
+The default is eight seconds per command, so a complete pass may take several
+minutes. Capture files stay outside version control. Review the observations
+with Ryan before correcting the adopted contract or marking it frozen.
+
 Start with the normal MARVIN stack running:
 
 ```bash

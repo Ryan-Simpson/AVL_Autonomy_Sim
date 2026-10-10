@@ -1,0 +1,17 @@
+# Humble / Fortress: bridge only the implemented command + raw odometry loop.
+- ros_topic_name: /cmd_vel
+  gz_topic_name: /model/tracked_rover/cmd_vel
+  ros_type_name: geometry_msgs/msg/Twist
+  gz_type_name: ignition.msgs.Twist
+  direction: ROS_TO_GZ
+- ros_topic_name: /wheel_odom
+  gz_topic_name: /model/tracked_rover/odometry
+  ros_type_name: nav_msgs/msg/Odometry
+  gz_type_name: ignition.msgs.Odometry
+  direction: GZ_TO_ROS
+# World-scoped input also works when Gazebo does not advertise global /clock.
+- ros_topic_name: /clock
+  gz_topic_name: /world/igvc_course/clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: ignition.msgs.Clock
+  direction: GZ_TO_ROS

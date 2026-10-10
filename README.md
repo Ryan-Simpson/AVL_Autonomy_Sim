@@ -56,6 +56,10 @@ AVL_Autonomy_Sim/
 
 ## Requirements (planned)
 
+Current command/raw-odometry bringup and verification:
+[docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
+Sensor interface status: [docs/SENSOR_INTEGRATION.md](docs/SENSOR_INTEGRATION.md).
+
 - ROS 2 Humble  
 - Gazebo Fortress (`ign gazebo`) + `ros-humble-ros-gz`  
 - C++17 toolchain (`colcon`, `rclcpp`)  
