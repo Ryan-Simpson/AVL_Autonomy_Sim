@@ -28,7 +28,7 @@ def generate_launch_description():
         resource_path = models
 
     robot_description = ParameterValue(
-        Command(['xacro ', xacro_path]), value_type=str)
+        Command(['xacro ', xacro_path, ' model:=', LaunchConfiguration('model')]), value_type=str)
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -42,6 +42,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
+        DeclareLaunchArgument('model', default_value='v1'),
         SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', resource_path),
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', resource_path),
         gz_sim,
