@@ -49,7 +49,12 @@
             <size>4 2 0.05</size>
           </box>
         </geometry>
-        <material><ambient>0.25 0.55 0.25 1</ambient><diffuse>0.25 0.55 0.25 1</diffuse></material>
+        <material>
+          <ambient>0.45 0.95 0.45 1</ambient>
+          <diffuse>0.35 0.9 0.35 1</diffuse>
+          <specular>0.05 0.05 0.05 1</specular>
+          <emissive>0.08 0.2 0.08 1</emissive>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -79,7 +84,12 @@
             <size>4 2 0.05</size>
           </box>
         </geometry>
-        <material><ambient>0.25 0.55 0.25 1</ambient><diffuse>0.25 0.55 0.25 1</diffuse></material>
+        <material>
+          <ambient>0.45 0.95 0.45 1</ambient>
+          <diffuse>0.35 0.9 0.35 1</diffuse>
+          <specular>0.05 0.05 0.05 1</specular>
+          <emissive>0.08 0.2 0.08 1</emissive>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -101,79 +111,7 @@
         </surface>
       </collision>
     </link>
-    <!--barricade-->
-    <link name="barricade1">
-      <pose>-19.1652 -17.2165 1.5 0 0 -0.8</pose>
-      <visual name="visual">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-        <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
-      </visual>
-      <collision name="collision">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-      </collision>
-    </link>
-    <link name="barricade2">
-      <pose>18.8846 -17.517 1.5 0 0 0.21445</pose>
-      <visual name="visual">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-        <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
-      </visual>
-      <collision name="collision">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-      </collision>
-    </link>
-    <link name="barricade3">
-      <pose>9.57 12.3819 1.5 0 0 -0.30353</pose>
-      <visual name="visual">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-        <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
-      </visual>
-      <collision name="collision">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-      </collision>
-    </link>
-    <link name="barricade4">
-      <pose>-8.5858 12.1745 1.5 0 0 0.14831</pose>
-      <visual name="visual">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-        <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
-      </visual>
-      <collision name="collision">
-        <geometry>
-          <box>
-            <size>3 0.5 3</size>
-          </box>
-        </geometry>
-      </collision>
-    </link>
+    <!-- barricades (3x0.5x3 wall boxes) removed for open lighting tests -->
     <!--construction barrel-->
     <link name="construction_barrel1">
       <pose>14.8591 -15.356 0 0 0 0</pose>
@@ -183,6 +121,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -200,6 +150,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -217,6 +179,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -234,6 +208,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -251,6 +237,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -268,6 +266,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -285,6 +295,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -302,6 +324,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -319,6 +353,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -336,6 +382,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -353,6 +411,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -370,6 +440,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -387,6 +469,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -404,6 +498,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -421,6 +527,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -438,6 +556,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -455,6 +585,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -472,6 +614,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -489,6 +643,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -506,6 +672,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -523,6 +701,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -540,6 +730,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -557,6 +759,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -574,6 +788,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -591,6 +817,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -608,6 +846,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -625,6 +875,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -642,6 +904,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -659,6 +933,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -676,6 +962,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -693,6 +991,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -710,6 +1020,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -727,6 +1049,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>
@@ -744,6 +1078,18 @@
             <uri>meshes/construction_barrel.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/Construction_Barrel_Diffuse.png</albedo_map>
+              <metalness>0.0</metalness>
+              <roughness>0.9</roughness>
+            </metal>
+          </pbr>
+        </material>
       </visual>
       <collision name="collision">
         <geometry>

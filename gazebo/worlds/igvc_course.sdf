@@ -4,10 +4,11 @@
     <!--
       Default autonomy-sim world.
       IGVC course from Hosei Orange (Apache-2.0).
-      https://github.com/KBKN-Autonomous-Robotics-Lab/orange_ros2
       Model: gazebo/models/orange_igvc
-      Launch with IGN_GAZEBO_RESOURCE_PATH including gazebo/models.
-      The tracked rover is spawned at 0 1 0.05, yaw 90 deg, facing up the course.
+      Rover spawn: 0 1 0.05, yaw 90 deg.
+
+      Fortress often crushes COLLADA colors unless scene ambient is high.
+      Ambient near white shows texture colors; sun adds direction.
     -->
     <physics name="1ms" type="ignored">
       <max_step_size>0.001</max_step_size>
@@ -17,11 +18,17 @@
     <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
     <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
 
+    <scene>
+      <ambient>0.95 0.95 0.95 1</ambient>
+      <background>0.6 0.7 0.8 1</background>
+      <shadows>true</shadows>
+    </scene>
+
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
-      <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
+      <diffuse>1.0 0.95 0.88 1</diffuse>
+      <specular>0.05 0.05 0.04 1</specular>
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 

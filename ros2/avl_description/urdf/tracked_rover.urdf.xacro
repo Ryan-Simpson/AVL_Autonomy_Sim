@@ -235,6 +235,10 @@
       <right_joint>right_front_wheel_joint</right_joint>
       <wheel_separation>${wheel_separation}</wheel_separation>
       <wheel_radius>${wheel_radius}</wheel_radius>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <!-- Defaults: /model/tracked_rover/cmd_vel, /odometry, /tf -->
       <max_linear_velocity>1.0</max_linear_velocity>
       <min_linear_velocity>-1.0</min_linear_velocity>
       <max_angular_velocity>1.0</max_angular_velocity>

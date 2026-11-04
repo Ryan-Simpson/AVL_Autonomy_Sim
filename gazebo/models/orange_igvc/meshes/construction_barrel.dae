@@ -36,7 +36,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color>0.2 0.2 0.2 1</color>
+              <color>0.25 0.12 0.02 1</color>
             </emission>
             <ambient>
               <color>1.0 1.0 1.0 1</color>
@@ -46,7 +46,7 @@
                 texcoord="CHANNEL1" />
             </diffuse>
             <specular>
-              <color>0.9 0.9 0.9 1</color>
+              <color>0.0 0.0 0.0 1</color>
             </specular>
             <shininess>
               <float>1</float>
@@ -62,11 +62,8 @@
             </transparency>
           </phong>
           <extra>
+            <!-- Spec map disabled: Fortress was washing orange toward gray. -->
             <technique profile="OpenCOLLADA3dsMax">
-              <specularLevel>
-                <texture texture="Construction_Barrel_Spec_tga-sampler"
-                  texcoord="CHANNEL1" />
-              </specularLevel>
             </technique>
           </extra>
         </technique>

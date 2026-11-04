@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="igvc_hand_drawn">
+    <static>true</static>
+    <!--
+      Blender exported this thin box with thickness along Y (XZ face).
+      Gazebo is Z-up, so rotate +90 deg about X to lay the track flat.
+      Extent after rotation: about 120 m in X, 170 m in Y, 0.25 m thick.
+    -->
+    <link name="track">
+      <pose>0 0 0 1.57079632679 0 0</pose>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://igvc_hand_drawn/meshes/igvc_hand_drawn_track.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>180 180</size>
+          </plane>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
