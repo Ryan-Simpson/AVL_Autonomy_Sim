@@ -5,13 +5,11 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
-    DeclareLaunchArgument,
-    ExecuteProcess,
     IncludeLaunchDescription,
     SetEnvironmentVariable,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import Command
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -21,6 +19,8 @@ def generate_launch_description():
     xacro_path = os.path.join(pkg, 'urdf', 'tracked_rover.urdf.xacro')
     world = os.path.join(pkg, 'worlds', 'igvc_course.sdf')
     models = os.path.join(pkg, 'models')
+    bridge_yaml = os.path.join(pkg, 'config', 'bridge.yaml')
+    sim_params = os.path.join(pkg, 'config', 'sim_params.yaml')
     resource_path = os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')
     if resource_path:
         resource_path = models + ':' + resource_path
@@ -41,17 +41,16 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('use_sim_time', default_value='true'),
         SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', resource_path),
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', resource_path),
         gz_sim,
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
-            parameters=[{
-                'robot_description': robot_description,
-                'use_sim_time': LaunchConfiguration('use_sim_time'),
-            }],
+            parameters=[
+                sim_params,
+                {'robot_description': robot_description},
+            ],
         ),
         Node(
             package='ros_gz_sim',
@@ -70,21 +69,7 @@ def generate_launch_description():
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
-            arguments=[
-                '/model/tracked_rover/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
-            ],
-            output='screen',
-        ),
-        # IGVC teleop publishes /cmd_vel. Diff-drive listens on the model topic.
-        ExecuteProcess(
-            cmd=['/usr/bin/python3.12', '-c',
-                 'import rclpy\n'
-                 'from geometry_msgs.msg import Twist\n'
-                 'rclpy.init()\n'
-                 'n = rclpy.create_node("cmd_vel_relay")\n'
-                 'p = n.create_publisher(Twist, "/model/tracked_rover/cmd_vel", 10)\n'
-                 'n.create_subscription(Twist, "/cmd_vel", lambda m: p.publish(m), 10)\n'
-                 'rclpy.spin(n)\n'],
+            parameters=[{'config_file': bridge_yaml}],
             output='screen',
         ),
     ])

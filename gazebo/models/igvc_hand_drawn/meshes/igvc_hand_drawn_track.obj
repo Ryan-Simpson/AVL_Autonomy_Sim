@@ -1,6 +1,6 @@
 # Blender 5.2.2 LTS
 # www.blender.org
-mtllib igvc hand drawn track.mtl
+mtllib igvc_hand_drawn_track.mtl
 o Cube
 v 60.000000 0.125000 -85.000000
 v 60.000000 -0.125000 -85.000000
