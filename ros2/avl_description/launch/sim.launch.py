@@ -5,11 +5,12 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
+    DeclareLaunchArgument,
     IncludeLaunchDescription,
     SetEnvironmentVariable,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
+from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -28,7 +29,7 @@ def generate_launch_description():
         resource_path = models
 
     robot_description = ParameterValue(
-        Command(['xacro ', xacro_path]), value_type=str)
+        Command(['xacro ', xacro_path, ' model:=', LaunchConfiguration('model')]), value_type=str)
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -41,6 +42,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        DeclareLaunchArgument('model', default_value='v1'),
         SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', resource_path),
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', resource_path),
         gz_sim,
