@@ -8,5 +8,5 @@ Copied from `src/avros_bringup/config/` at commit `654ad97` (2026-10-14). Do not
 | `nav2_params_igvc_autonav.yaml`, `navigate_igvc_autonav_2026.xml` | `nav_sim.launch.py`, Parsa's competition pair |
 | (not copied) `cpp_campus_graph.geojson` | 11.6 MB of CPP-campus graph. Replaced by our 2-node `sim_route_graph.geojson`, used only so `route_server` can activate. The competition BT does not use routes. |
 
-`waypoints_sim.yaml` is ours: sim-course waypoints in Parsa's format (see its header).
+`waypoints_lap.yaml` (full lap, the `nav_sim.launch.py` default) and `waypoints_sim.yaml` (older half-lap set, kept as a short test) are ours: sim-course waypoints in Parsa's format (see their headers).
 `ekf.yaml` and `navsat.yaml` have a two-line source header added; the other copied files are byte-for-byte.
