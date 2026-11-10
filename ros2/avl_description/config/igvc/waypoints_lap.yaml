@@ -1,0 +1,69 @@
+# Full-lap sim waypoints for igvc_course.sdf, in Paarseus/IGVC_ROS2 waypoints.yaml format so
+# his mission_manager reads them unchanged (sent in order, next goal sent at 2.0 m).
+#
+# Picked 2026-11-09 (Ryan: "i want it to do a full lap"). Counterclockwise from the spawn
+# (map 0, 0.1, facing east): south lane -> east side (through the barrel slalom) -> north
+# lane (over the ramp at map 0, 29.3) -> west side -> back along the south lane to 3 m behind
+# the spawn. About 147 m.
+# Method (v2, after run 1 stuck at the south-east bend): clearance = min(distance to painted
+# line [ground.png at world 0, 16.3], barrel centre - 0.3 m [model.sdf poses]). Grid Dijkstra
+# (0.2 m), cost 1 + 8/clearance^2, centre cells under 0.8 m blocked; Parsa's nav2 footprint
+# rectangle (front 0.8128, rear 0.2794, half-width 0.415) swept along the route stays >= 0.30 m
+# off every line. Waypoints every ~3 m (>= 2.4 m apart, so the 2.0 m switch never skips one),
+# then nudged up to 1 m so the corner-cut segments mission_manager really commands (it aims at
+# the next waypoint from 2 m before the current one) stay clear of lines where possible.
+# Every waypoint >= 0.81 m from any line or barrel edge.
+# Ramp caveat: the waypoints near y 29.3 sit on the ramp (0.3 m peak, 8.5 deg). Not yet
+# tested: the LiDAR height band may mark it as an obstacle, and climbing is unproven.
+# Map = world because the world origin is the navsat datum. lat/lon from navsat_transform's
+# /toLL with config/igvc/navsat.yaml, so /fromLL round-trips them. Map (x, y) per comment.
+
+waypoints:
+  - {lat: 34.0592973645392, lon: -117.82183443506099}   # map (2.4, -0.3)
+  - {lat: 34.05929736452801, lon: -117.82180192888708}   # map (5.4, -0.3)
+  - {lat: 34.05929556087414, lon: -117.82177592394962}   # map (7.8, -0.5)
+  - {lat: 34.0592937571812, lon: -117.82171741284012}   # map (13.2, -0.7)
+  - {lat: 34.059293757148154, lon: -117.82169140790158}   # map (15.6, -0.7)
+  - {lat: 34.059297364380164, lon: -117.82166106879802}   # map (18.4, -0.3)
+  - {lat: 34.059315400742165, lon: -117.82164589920434}   # map (19.8, 1.7)
+  - {lat: 34.05935327714823, lon: -117.82164156494972}   # map (20.2, 5.9)
+  - {lat: 34.05937492083178, lon: -117.8216524002959}   # map (19.2, 8.3)
+  - {lat: 34.059383939066315, lon: -117.8216784052403}   # map (16.8, 9.3)
+  - {lat: 34.05940919000198, lon: -117.8216740710246}   # map (17.2, 12.1)
+  - {lat: 34.05943083366974, lon: -117.82167623805958}   # map (17.0, 14.5)
+  - {lat: 34.059463299181864, lon: -117.82168707340321}   # map (16.0, 18.1)
+  - {lat: 34.05949035374365, lon: -117.82167407084995}   # map (17.2, 21.1)
+  - {lat: 34.05950478282274, lon: -117.82165456706669}   # map (19.0, 22.7)
+  - {lat: 34.05952823012216, lon: -117.82165239992706}   # map (19.2, 25.3)
+  - {lat: 34.05955348107773, lon: -117.82166106820623}   # map (18.4, 28.1)
+  - {lat: 34.05958414293175, lon: -117.82165890105085}   # map (18.6, 31.5)
+  - {lat: 34.05958233934336, lon: -117.82169357442409}   # map (15.4, 31.3)
+  - {lat: 34.059567910279036, lon: -117.82173258198475}   # map (11.8, 29.7)
+  - {lat: 34.05958955396583, lon: -117.82175858698245}   # map (9.4, 32.1)
+  - {lat: 34.059580535788925, lon: -117.82178242493296}   # map (7.2, 31.1)
+  - {lat: 34.05956971396882, lon: -117.82180626287936}   # map (5.0, 29.9)
+  - {lat: 34.05956249942184, lon: -117.82183226790359}   # map (2.6, 29.1)
+  - {lat: 34.059560695784214, lon: -117.82187127543318}   # map (-1.0, 28.9)
+  - {lat: 34.05956610669303, lon: -117.82189944754023}   # map (-3.6, 29.5)
+  - {lat: 34.05957692851112, lon: -117.82192761965536}   # map (-6.2, 30.7)
+  - {lat: 34.05958414304721, lon: -117.82195362468774}   # map (-8.6, 31.5)
+  - {lat: 34.05957332116286, lon: -117.82200563472054}   # map (-13.4, 30.3)
+  - {lat: 34.05958414294668, lon: -117.82204030810749}   # map (-16.6, 31.5)
+  - {lat: 34.05957512471187, lon: -117.82206631311072}   # map (-19.0, 30.5)
+  - {lat: 34.05955348103408, lon: -117.8220749813957}   # map (-19.8, 28.1)
+  - {lat: 34.059528230094344, lon: -117.82207498133056}   # map (-19.8, 25.3)
+  - {lat: 34.05950658644676, lon: -117.82206631294088}   # map (-19.0, 22.9)
+  - {lat: 34.05948674645088, lon: -117.82204897622799}   # map (-17.4, 20.7)
+  - {lat: 34.05946690644614, lon: -117.82203597368823}   # map (-16.2, 18.5)
+  - {lat: 34.059439851870415, lon: -117.8220338065496}   # map (-16.0, 15.5)
+  - {lat: 34.059410993649706, lon: -117.822035973571}   # map (-16.2, 12.3)
+  - {lat: 34.05938934995673, lon: -117.8220554772505}   # map (-18.0, 9.9)
+  - {lat: 34.059362295348706, lon: -117.82207281382658}   # map (-19.6, 6.9)
+  - {lat: 34.05933524075422, lon: -117.82208148207528}   # map (-20.4, 3.9)
+  - {lat: 34.059308186190314, lon: -117.82207281369112}   # map (-19.6, 0.9)
+  - {lat: 34.05929736440724, lon: -117.82204247456973}   # map (-16.8, -0.3)
+  - {lat: 34.05929556080435, lon: -117.82201646962824}   # map (-14.4, -0.5)
+  - {lat: 34.0592955608346, lon: -117.82199046469049}   # map (-12.0, -0.5)
+  - {lat: 34.059297364499805, lon: -117.82196229267662}   # map (-9.4, -0.3)
+  - {lat: 34.059300971805406, lon: -117.8219189511148}   # map (-5.4, 0.1)
+  - {lat: 34.05930097181504, lon: -117.82189294617496}   # map (-3.0, 0.1)

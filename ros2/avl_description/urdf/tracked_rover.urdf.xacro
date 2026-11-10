@@ -180,6 +180,14 @@
     </sensor>
   </gazebo>
 
+  <!-- SIM-ONLY OVERRIDE (Ryan, 2026-11-09): logic test, not the real mounts. All three ZEDs
+       raised 1.0 m above their IGVC positions (they float above the chassis), and the side
+       ZEDs tilted 30 deg down, so the part of the image Parsa's perception uses (below his
+       top-60% sky mask) sees the floor: front ~1.0-3.1 m ahead instead of 0.3-1.0 m, sides
+       ~0.5-1.9 m out. Set both to 0 to go back to the measured mounts. -->
+  <xacro:property name="zed_sim_raise" value="1.0"/>
+  <xacro:property name="zed_side_pitch" value="${radians(30)}"/>
+
   <!-- Camera boxes stand in for zed_wrapper's zed_macro. -->
   <link name="zed_front_camera_link">
     <visual>
@@ -191,7 +199,7 @@
     <parent link="base_link"/>
     <child link="zed_front_camera_link"/>
     <!-- IGVC stand-in. avros_cam_sim calls this zed_front. 15 deg down. -->
-    <origin xyz="${p['zed_front_x']} 0 ${xsens_height - p['zed_front_z_below_imu']}" rpy="0 ${radians(p['zed_front_pitch_deg'])} 0"/>
+    <origin xyz="${p['zed_front_x']} 0 ${xsens_height - p['zed_front_z_below_imu'] + zed_sim_raise}" rpy="0 ${radians(p['zed_front_pitch_deg'])} 0"/>
   </joint>
 
   <link name="zed_left_camera_link">
@@ -204,7 +212,7 @@
     <parent link="base_link"/>
     <child link="zed_left_camera_link"/>
     <!-- IGVC stand-in. Faces left. -->
-    <origin xyz="${p['zed_left_xy']} ${xsens_height + p['zed_left_z_above_imu']}" rpy="${p['zed_left_rpy']}"/>
+    <origin xyz="${p['zed_left_xy']} ${xsens_height + p['zed_left_z_above_imu'] + zed_sim_raise}" rpy="0 ${zed_side_pitch} 1.5708"/>
   </joint>
 
   <link name="zed_right_camera_link">
@@ -217,7 +225,7 @@
     <parent link="base_link"/>
     <child link="zed_right_camera_link"/>
     <!-- IGVC stand-in. Faces right. -->
-    <origin xyz="${p['zed_right_xy']} ${xsens_height + p['zed_right_z_above_imu']}" rpy="${p['zed_right_rpy']}"/>
+    <origin xyz="${p['zed_right_xy']} ${xsens_height + p['zed_right_z_above_imu'] + zed_sim_raise}" rpy="0 ${zed_side_pitch} -1.5708"/>
   </joint>
 
   <!-- Optical frames: x right, y down, z forward. -->

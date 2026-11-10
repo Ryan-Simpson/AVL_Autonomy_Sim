@@ -8,7 +8,8 @@ real-robot nodes (sensors, actuator_node, foxglove, autonomy_monitor):
     (config/igvc/nav2_params_igvc_autonav.yaml + navigate_igvc_autonav_2026.xml)
   - 3x avros_perception perception_node (camera lines -> semantic layer)
   - avros_perception lidar_preprocessor (LiDAR obstacles -> STVL)
-  - avros_navigation mission_manager after 20 s, on config/igvc/waypoints_sim.yaml
+  - avros_navigation mission_manager after 20 s, on config/igvc/waypoints_lap.yaml (full lap;
+    waypoints_sim.yaml is the older half-lap set)
 
 avros_perception, avros_navigation, and semantic_segmentation_layer
 (Paarseus fork, branch avros-fixes) are not in this repo. Build them in a
@@ -101,7 +102,7 @@ def generate_launch_description():
         actions=[Node(
             package='avros_navigation', executable='mission_manager',
             name='mission_manager', output='screen',
-            parameters=[{'waypoints_file': os.path.join(igvc, 'waypoints_sim.yaml'),
+            parameters=[{'waypoints_file': os.path.join(igvc, 'waypoints_lap.yaml'),
                          'use_sim_time': True}],
         )],
         condition=IfCondition(LaunchConfiguration('mission')),
