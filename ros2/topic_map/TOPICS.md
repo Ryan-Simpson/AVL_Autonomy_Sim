@@ -28,13 +28,13 @@
 | `/nmea` | `nmea_msgs/msg/Sentence` | publish |
 | `/rtcm` | `rtcm_msgs/msg/Message` | publish |
 | `/velodyne_points` | `sensor_msgs/msg/PointCloud2` | publish |
-| `/zed_front/zed_node/rgb/image_rect_color` | `sensor_msgs/msg/Image` | publish |
+| `/zed_front/zed_node/rgb/color/rect/image` | `sensor_msgs/msg/Image` | publish |
 | `/zed_front/zed_node/point_cloud/cloud_registered` | `sensor_msgs/msg/PointCloud2` | publish |
 | `/zed_front/zed_node/odom` | `nav_msgs/msg/Odometry` | publish |
-| `/zed_left/zed_node/rgb/image_rect_color` | `sensor_msgs/msg/Image` | publish |
+| `/zed_left/zed_node/rgb/color/rect/image` | `sensor_msgs/msg/Image` | publish |
 | `/zed_left/zed_node/point_cloud/cloud_registered` | `sensor_msgs/msg/PointCloud2` | publish |
 | `/zed_left/zed_node/odom` | `nav_msgs/msg/Odometry` | publish |
-| `/zed_right/zed_node/rgb/image_rect_color` | `sensor_msgs/msg/Image` | publish |
+| `/zed_right/zed_node/rgb/color/rect/image` | `sensor_msgs/msg/Image` | publish |
 | `/zed_right/zed_node/point_cloud/cloud_registered` | `sensor_msgs/msg/PointCloud2` | publish |
 | `/zed_right/zed_node/odom` | `nav_msgs/msg/Odometry` | publish |
 | `/avros/actuator_state` | `avros_msgs/msg/ActuatorState` | publish |

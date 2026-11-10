@@ -1,0 +1,289 @@
+<!--
+  navigate_igvc_autonav_2026.xml — IGVC 2026 AutoNav COMPETITION Behavior Tree
+
+  *** COMPETITION TREE — DO NOT FIELD-TEST WITH THESE TIMERS ***
+  Duplicate of navigate_igvc_autonav_humble.xml (the field-test tree), tuned
+  2026-06-01 for the IGVC 2026 AutoNav run. The ONLY differences from the
+  field-test tree are the competition-clock-driven values below; the structure,
+  plugin set, and orchestration pattern are identical. The field-test tree
+  keeps its 120000 ms Timeout / 8 retries for benchtop persistence — this tree
+  is the one that goes on the start line.
+
+  Designed for ROS2 Humble + Navfn (GridBased) + MPPI (FollowPath) on the
+  AndyMark Raptor tracked diff-drive chassis (0.7366 m gauge, 0.8 m radius).
+
+  COMPETITION TUNING (2026-06-01), reverting field-test overrides + applying
+  the verified freeze-fix recovery ladder:
+    - Outer Timeout         : 45000 ms (was field-test 120000) — aborts the
+                              single NavigateToPose 15 s before the 60 s
+                              Hold-up/Blocking DQ so the orchestrator can skip
+                              the wedged waypoint.
+    - Outer retries         : 4 (was field-test 8) — exactly the 4-child
+                              RoundRobin ladder reachable once each; fewer
+                              retries = less dead time against the 1 mph
+                              minimum-average rule.
+    - RateController        : 3.0 Hz (Jetson-live; laptop tree had 1.0) — cuts replan latency so the
+                              global path bows around a freshly-seen barrel
+                              sooner; planner_server has 5 Hz capacity.
+    - RECOVERY-ESCALATION ORDER (gentlest -> blindest, per RoundRobin child idx):
+        [0] ClearCostmapAroundRobot reset_distance=1.5  (surgical local clear;
+            preserves LETHAL lane cells > 1.5 m so the next replan can't route
+            over a white line — II.4 Crossing-an-Internal-Line E-stop)
+        [1] Wait wait_duration=3   (clears stale cells: > semantic
+            tile_map_decay_time 1.5 s, at/under STVL voxel_decay 3.0 s)
+        [2] DriveOnHeading 0.30 m @ 0.15 m/s, time_allowance 8 s  (forward
+            crawl FIRST — has an always-on forward collision check vs the
+            local costmap (STVL barrels + kiwicampus LETHAL lanes), re-seats
+            MPPI past a borderline gap, clears required_movement_radius 0.3)
+        [3] BackUp 0.25 m @ 0.10 m/s, time_allowance 5 s  (short blind reverse
+            LAST — no rear sensor, so rear costmap reads FREE; only reached on
+            the 4th retry as a true last resort; short distance + 5 s cap keeps
+            it from burning the 45 s Timeout)
+      NO Spin anywhere (rectangular footprint sweep would cross the 3 in line =
+      II.4 E-stop).
+
+  SYNTHESIS SOURCES:
+    - TnTech IGVC 2026 (LCAS-Lab/TnTechIGVC2026 :: igvc_bt.xml) — base structure
+    - Sooner Robotics 2024/2025 (SoonerRobotics/autonav_software_2024/2025) — orchestration pattern
+    - Hosei orange_ros2 (KBKN-Autonomous-Robotics-Lab) — costmap-layer SetParameters
+    - RoboJackets igvc-software — back_circle pattern (intentionally NOT adopted; MPPI PreferForwardCritic covers it)
+    - IGVC 2026 Official Rules (igvc.org/2026rules.pdf, retrieved 2026-05-12)
+
+  DESIGN PHILOSOPHY — "Dumb BT, smart orchestrator":
+    - This BT executes ONE NavigateToPose at a time
+    - A separate `mission_manager` Python node (to be implemented) owns:
+        * waypoint cursor (lat/lon list, popped on 2.0 m proximity)
+        * No-Man's-Land state machine (per-waypoint metadata tags)
+        * GPS health watchdog (drop-to-dead-reckon at 2 s degraded, full
+          forward-bias-only at 30 s lost)
+        * SetParameters side-effects (toggle semantic_layer.lane_white,
+          inflate goal_checker xy_tolerance, cap MPPI vx_max on ramp)
+    - Orchestrator fires fresh NavigateToPose goals at 2 Hz with whatever
+      goal is current; THIS BT is dumb — it just plans, follows, recovers.
+
+  IGVC 2026 RULE-DRIVEN CONSTRAINTS encoded here:
+    - 60 s Hold-up Traffic / Blocking DQ      -> outer Timeout msec=45000 (15 s margin)
+    - 3-inch white-tape lane crossing penalty -> NO Spin (rectangular footprint sweeps
+                                                  2.48 m diameter when off-center);
+                                                  surgical reset_distance=1.5 preserves
+                                                  LETHAL lane cells; forward crawl before
+                                                  blind reverse keeps recovery off the line
+    - Remote control forbidden                -> NO AssistedTeleop
+    - 1 mph minimum average over run          -> Wait capped at 3 s, recovery
+                                                  budget 4 retries x ~8 s
+    - Random obstacles every run              -> ComputePathToPose (not ComputeRoute);
+                                                  campus GeoJSON graph reserved for testing
+    - Mandatory payload, e-stop, safety light -> handled at orchestrator level,
+                                                  not in this BT
+
+  RECOVERY ORDER (gentlest-to-blindest, RoundRobin child index):
+    [0]. ClearCostmapAroundRobot reset_distance=1.5  (zero-motion, surgical
+                                        local clear; no DQ risk; preserves
+                                        LETHAL lane cells > 1.5 m)
+    [1]. Wait wait_duration=3          (exploits kiwicampus semantic_layer
+                                        tile_map_decay_time=1.5 + STVL
+                                        voxel_decay 3.0 s to clear stale cells)
+    [2]. DriveOnHeading 0.30 m @ 0.15  (~2.2 s; forward crawl with always-on
+                                        forward collision check; nudges through
+                                        borderline passages MPPI rejected;
+                                        clears required_movement_radius 0.3)
+    [3]. BackUp 0.25 m @ 0.10 m/s      (~2.5 s; short blind reverse, LAST
+                                        resort, only reached on the 4th retry;
+                                        no rear sensor so rear costmap reads
+                                        FREE — kept short + 5 s capped)
+
+  REQUIRES (Phase 5 validation will enforce) — MUST match the COMPETITION yaml:
+    - bt_navigator.plugin_lib_names MUST include:
+        nav2_back_up_action_bt_node
+        nav2_drive_on_heading_bt_node
+      (everything else — ComputePathToPose, FollowPath, ClearEntireCostmap,
+       ClearCostmapAroundRobot, GoalUpdated — is already registered in
+       nav2_params_humble.yaml plugin_lib_names)
+    - behavior_server.behavior_plugins MUST include backup, drive_on_heading,
+      wait (already present per nav2_params_humble.yaml). Spin is deliberately
+      absent — keep it absent in the competition yaml too.
+    - Timeout, RecoveryNode, PipelineSequence, RateController, ReactiveFallback,
+      RoundRobin are BT.CPP v3 builtins / nav2 control nodes and need no
+      action-plugin registration.
+
+  HOW TO USE:
+    ros2 launch avros_bringup navigation.launch.py \
+      bt_xml:=navigate_igvc_autonav_2026.xml
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+
+    <!-- OUTER WATCHDOG: hard-abort the whole navigation action after 45 s.
+         IGVC Hold-up Traffic rule fires at 60 s — 15 s margin lets the
+         action FAILURE bubble up to the mission_manager, which can either
+         skip the current waypoint or signal the operator-held wireless
+         e-stop. Without this, a wedged MPPI could burn the full 60 s and
+         disqualify the run on a single stuck waypoint. -->
+    <Timeout msec="45000">  <!-- COMPETITION value (2026-06-01): hard-abort the single NavigateToPose 15 s before the 60 s IGVC Hold-up/Blocking DQ. The field-test tree uses 120000 (no DQ clock); this is the start-line value. -->
+
+      <!-- OUTER RECOVERY: 4 retries (COMPETITION value, 2026-06-01). Each
+           navigation FAILURE ticks exactly ONE RoundRobin child (retry N runs
+           child N mod 4), so 4 retries makes the full 4-child recovery ladder
+           [ClearAroundRobot, Wait, DriveOnHeading, BackUp] reachable exactly
+           once each — including the last-resort blind BackUp on retry 3.
+           Worst-case recovery motion ~6.5 s, comfortably under the 45 s
+           Timeout and the 60 s DQ. Fewer retries than the field-test 8 = less
+           dead time against the 1 mph minimum-average rule. After 4 failures
+           the Timeout catches us via the FAILURE return. -->
+      <RecoveryNode number_of_retries="4" name="NavigateRecovery">  <!-- COMPETITION value (2026-06-01): full 4-child RoundRobin ladder reachable once each. Field-test tree uses 8. -->
+
+        <!-- MAIN PIPELINE: replan + follow, with per-step recovery. The plan
+             step is throttled by a RateController (hz=3.0, see below) so the
+             PipelineSequence doesn't re-tick the planner at the full BT rate;
+             the orchestrator additionally fires fresh goals at 2 Hz (TnTech
+             pattern). FollowPath runs continuously off the latest {path}. -->
+        <PipelineSequence name="NavigateWithReplanning">
+
+          <!-- PLAN step. Wrapped in RateController to throttle the planning
+               subtree (without it, PipelineSequence re-ticks the planner at the
+               full BT rate ~10 Hz, causing path thrashing and wasted CPU).
+               COMPETITION value (2026-06-01): hz=3.0 — adopt the Jetson-LIVE
+               replan rate (the laptop-committed tree had 1.0). Cuts replan
+               latency to ~0.33 s so the global Navfn path bows around a
+               freshly-seen barrel sooner. SAFE on budget:
+               planner_server expected_planner_frequency is 5.0 (3 Hz < 5 Hz
+               capacity) and the Navfn-Dijkstra search runs in planner_server, a
+               separate process from the 20 Hz MPPI control loop, so it does not
+               steal MPPI cycles. Keep the RateController (don't remove it) to
+               prevent path thrashing at the full BT rate.
+               Inner RecoveryNode(retries=1) clears the GLOBAL costmap if Navfn
+               fails — stale semantic_layer marks from old camera frames are the
+               most common failure mode on this stack (kiwicampus tile_map_decay_time=1.5
+               + raytrace patch usually resolves them, but a forced clear unblocks
+               the planner immediately). -->
+          <RateController hz="3.0">
+            <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+              <ComputePathToPose goal="{goal}"
+                                 path="{path}"
+                                 planner_id="GridBased"/>
+              <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+                service_name="global_costmap/clear_entirely_global_costmap"/>
+            </RecoveryNode>
+          </RateController>
+
+          <!-- FOLLOW step. Inner ClearLocal removed — when MPPI correctly
+               refused to cross a lane, the clear wiped the lane from the
+               costmap and MPPI then drove through the now-empty area before
+               perception could re-mark it. FollowPath failures now bubble
+               straight to the outer recovery sub-tree, whose RoundRobin
+               ladder includes a 3 s Wait (child[1]) on the second retry to
+               let perception/STVL re-fill (lets stale cells decay). -->
+          <FollowPath path="{path}"
+                      controller_id="FollowPath"
+                      goal_checker_id="general_goal_checker"/>
+
+        </PipelineSequence>
+
+        <!-- RECOVERY SUB-TREE: runs ONLY if PipelineSequence returns FAILURE
+             after its own inner retries are exhausted (i.e. ClearGlobal +
+             replan didn't fix it AND ClearLocal + re-follow didn't fix it).
+
+             ReactiveFallback aborts the recovery the moment the goal
+             changes — GoalUpdated returns SUCCESS as soon as the
+             orchestrator publishes a new carrot, so an in-flight BackUp
+             stops and the next plan-follow cycle starts fresh. -->
+        <ReactiveFallback name="RecoveryFallback">
+          <GoalUpdated/>
+
+          <!-- RoundRobin per canonical Humble pattern in
+               navigate_to_pose_w_replanning_and_recovery.xml. RoundRobin cycles
+               through children on successive recovery invocations, escalating
+               GENTLEST -> BLINDEST (COMPETITION order, 2026-06-01):
+                 child[0] = ClearAroundRobot  (surgical local clear, reset 1.5)
+                 child[1] = Wait              (3 s — clears stale semantic/STVL cells)
+                 child[2] = DriveOnHeading    (forward crawl 0.30 m — collision-checked)
+                 child[3] = BackUp            (blind reverse 0.25 m — LAST resort)
+               then wraps. With outer RecoveryNode number_of_retries=4 each rung
+               fires exactly once before the goal fails. Forward crawl is moved
+               AHEAD of the blind reverse: DriveOnHeading has an always-on
+               forward collision check (projects +vx over simulate_ahead_time
+               against the local costmap, which carries STVL barrels AND
+               kiwicampus LETHAL lanes), so it nudges the well-sensed FRONT and
+               never crosses a line behind. BackUp inherits that check but
+               forces negative speed; its rear check reads costmap cells where
+               this robot has NO rear sensor (read FREE), so it reverses
+               effectively blind — hence pushed LAST.
+
+               Unconditional ClearEntireCostmap on the global costmap is
+               deliberately NOT used here — wiping the global costmap forces the
+               next planner tick to route THROUGH where the persistent painted
+               lane was until perception re-marks it. ClearCostmapAroundRobot
+               (reset_distance 1.5 m, COMPETITION value) resets only cells near
+               the robot, surgically clearing a phantom STVL/lane flicker hugging
+               base_link while preserving LETHAL lane cells and real barrels
+               beyond 1.5 m (II.4 Crossing-an-Internal-Line E-stop protection).
+
+               Spin still deliberately omitted: rectangular footprint
+               (1.0 x 0.74 m) sweeps a 2.48 m diameter circle when off-center,
+               exceeding the half-lane width (~1.5 m) and risking IGVC DQ. -->
+          <RoundRobin name="LaneAwareRecoveryActions">
+
+            <!-- [0] Surgical local clear. COMPETITION reset_distance=1.5 (was
+                 field-test 3.0): clears a phantom STVL/lane flicker hugging the
+                 robot while leaving LETHAL lane lines and real barrels beyond
+                 1.5 m intact, so the next replan can't route over a now-empty
+                 white line (II.4 Crossing-an-Internal-Line E-stop). -->
+            <ClearCostmapAroundRobot name="ClearAroundRobot-Recovery"
+              service_name="local_costmap/clear_around_local_costmap"
+              reset_distance="1.5"
+              server_timeout="5000"/>
+
+            <!-- [1] Wait. COMPETITION wait_duration=3 (was 2): a stale cell
+                 clears only after going un-reconfirmed for its decay window —
+                 semantic tile_map_decay_time 1.5 s / STVL voxel_decay 3.0 s.
+                 3 s gives clean margin past semantic decay while staying
+                 at/under the STVL window, so the next replan sees a cleaner
+                 costmap. Reached at most once per the 4-retry ladder, so +1 s
+                 is trivial against the 45 s Timeout / 60 s DQ. -->
+            <Wait wait_duration="3" name="WaitForSemanticDecay"/>
+
+            <!-- [2] Forward crawl FIRST (moved ahead of BackUp for competition,
+                 2026-06-01). COMPETITION dist 0.30 / speed 0.15 / time 8 (was
+                 0.15 / 0.10 / 10). DriveOnHeading's onRun maps target.x->dist,
+                 speed, time_allowance (all positive). 0.30 m @ 0.15 m/s is
+                 ~2.2 s effective, well under time_allowance 8 s. The
+                 unconditional isCollisionFree check (Humble has no disable
+                 port) simulates ~2.0 s = 0.30 m of forward lookahead against
+                 the local costmap (STVL barrels + LETHAL lanes), aborting
+                 before driving into a dead-ahead obstacle or white line. The
+                 0.30 m nudge re-seats MPPI past a borderline gap and clears
+                 required_movement_radius 0.3 (the old 0.15 m moved base_link
+                 only ~half a rear-inscribed-radius and barely re-seeded the
+                 planner). Strictly safer than the blind BackUp below. -->
+            <DriveOnHeading dist_to_travel="0.30"
+                            speed="0.15"
+                            time_allowance="8"
+                            name="CrawlForward"/>
+
+            <!-- [3] Short blind reverse, LAST resort (only reached on the 4th
+                 retry). COMPETITION backup_dist 0.25 / backup_speed 0.10 /
+                 time_allowance 5 (was 0.3 / 0.10 / 25). back_up.cpp forces
+                 backup_speed negative; the behavior ends on whichever of
+                 distance-reached or time_allowance-expired comes first.
+                 0.25 m @ 0.10 m/s = 2.5 s nominal; time_allowance 5 gives ~2x
+                 headroom (covers the actuator slew ramp without prematurely
+                 FAILING the maneuver). The critical fix is 25 -> 5: at 25 s a
+                 wedged/under-delivering BackUp could consume over half the 45 s
+                 competition Timeout in one cycle. With NO rear sensor the rear
+                 costmap reads FREE, so this is effectively blind — kept short,
+                 slow, and last in the RoundRobin. Right-sized rectangle
+                 footprint (rear edge -0.2794) means it is no longer
+                 collision-blocked at cycle zero. -->
+            <BackUp backup_dist="0.25"
+                    backup_speed="0.10"
+                    time_allowance="5"
+                    name="ShortBackup"/>
+
+          </RoundRobin>
+        </ReactiveFallback>
+
+      </RecoveryNode>
+    </Timeout>
+
+  </BehaviorTree>
+</root>

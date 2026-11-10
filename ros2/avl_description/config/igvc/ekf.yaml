@@ -1,0 +1,225 @@
+# Copied unchanged from Paarseus/IGVC_ROS2 src/avros_bringup/config/ekf.yaml @ 654ad97 (2026-10-14).
+# Do not edit here; re-copy from upstream. Sim world origin = navsat datum below.
+# Dual EKF configuration for GPS navigation
+# Based on: https://github.com/ros-navigation/navigation2_tutorials
+#   nav2_gps_waypoint_follower_demo/config/dual_ekf_navsat_params.yaml
+#
+# EKF #1 (odom): /imu/data + /wheel_odom (vx, vyaw) + ZED yaw-differential
+#                → publishes odom -> base_link (smooth, local)
+# EKF #2 (map):  /imu/data + /wheel_odom (vx, vyaw) + /odometry/gps (x,y diff)
+#                → publishes map -> odom (GPS-anchored, global)
+#
+# Sensor inputs (canonical Nav2 dual-EKF pattern: both EKFs fuse the same
+# continuous sensors; only the map EKF additionally fuses GPS):
+#   /imu/data            — Xsens MTi-680G @ 100 Hz, orientation + angular vel
+#   /wheel_odom          — actuator_node @ 50 Hz, vx + vyaw (inverse uses
+#                          physical track_w by design — see
+#                          docs/2026-05/skid_steer_kinematics_findings_2026_05_18.md
+#                          for the empirical decomposition)
+#   /zed_front/.../odom  — ZED VIO yaw rate ONLY (lever-arm safe; see
+#                          docs/reference/zed_vio_frame_analysis.md)
+#   /odometry/gps        — non-RTK SBAS, differential fusion + rejection gate
+
+# --- Local EKF: odom -> base_link ---
+ekf_filter_node_odom:
+  ros__parameters:
+    frequency: 30.0
+    two_d_mode: true
+    publish_tf: true
+    publish_acceleration: false
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # IMU: orientation + angular velocity (no acceleration — causes divergence)
+    imu0: /imu/data
+    imu0_config: [false, false, false,    # x, y, z position
+                  true,  true,  true,     # roll, pitch, yaw
+                  false, false, false,    # vx, vy, vz
+                  true,  true,  true,     # vroll, vpitch, vyaw
+                  false, false, false]    # ax, ay, az
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: true
+    imu0_queue_size: 10
+    # 2026-05-26: Mahalanobis outlier gates added after the Xsens stuck-bias
+    # incident documented in docs/2026-05/skid_steer_kinematics_findings_2026_05_18.md §6
+    # (gyro bias jumped to ~-2.86°/s = 70× normal; ROS-level restart did not
+    # recover, required USB power-cycle). Without these gates, the bad gyro
+    # data flows into both EKFs unfiltered until someone notices the chassis
+    # veering off-course. 5σ matches the conservative end of the GPS gate
+    # already used below (which is 4σ on a much noisier source).
+    imu0_pose_rejection_threshold: 5.0
+    imu0_twist_rejection_threshold: 5.0
+
+    # Wheel odometry from actuator_node — diff-drive forward kinematics
+    # Fuse only velocities (vx, vyaw); pose drifts so don't trust accumulated x/y/yaw
+    odom0: /wheel_odom
+    odom0_config: [false, false, false,    # x, y, z position
+                   false, false, false,    # roll, pitch, yaw
+                   true,  false, false,    # vx, vy, vz
+                   false, false, false,    # vroll, vpitch, vyaw  (2026-05-30: wheel vyaw REMOVED from heading — skid-steer wheel yaw unreliable; the Xsens gyro (field-verified 1.000 scale, bias 0.015 deg/s) owns yaw now)
+                   false, false, false]    # ax, ay, az
+    odom0_differential: false
+    odom0_relative: false
+    odom0_queue_size: 10
+
+    # 2026-05-12: ZED VIO fusion — YAW ONLY (no x/y).
+    #
+    # Why yaw only:
+    #   The ZED wrapper hardcodes its odom message's child_frame_id to
+    #   <camera_name>_camera_link (zed_camera_component_main.cpp:1593,6354),
+    #   and robot_localization's differential-pose path applies ONLY a
+    #   world->world rotation (ros_filter.cpp:3013) — there is NO lever-arm
+    #   (omega x r) correction. With our 0.68 m forward / 0.45 m up / 15 deg
+    #   pitch mount, fusing the x/y position from ZED would inject a fake
+    #   lateral velocity of omega * 0.68 m on every turn (~0.34 m/s lateral
+    #   bias at 0.5 rad/s — matches the T3 field-test observation that the
+    #   ZED VIO trajectory direction was rotated relative to base_link).
+    #   See docs/reference/zed_vio_frame_analysis.md for the full derivation, source
+    #   refs, and 20s live capture proving child_frame_id and covariance.
+    #
+    # Yaw rate is invariant under rigid translation (omega is the same at
+    # every point of a rigid body), so fusing yaw only sidesteps the lever
+    # arm entirely. ZED VIO yaw is the one thing it gives us that we can't
+    # get from the Xsens MTi-680G already: T3.2 showed +6 deg Xsens yaw
+    # drift during stationary pauses vs +0.26 deg from ZED over the same
+    # window (T3 report finding #3). That's the real benefit — keep it.
+    #
+    # differential=true is still required: ZED's odom starts at (0,0,0)
+    # whenever the wrapper boots; integrating yaw deltas (== angular
+    # velocity, dt-normalized inside rl) avoids initial-yaw race conditions
+    # with the IMU.
+    odom1: /zed_front/zed_node/odom
+    odom1_config: [false, false, false,    # x, y NOT fused — lever-arm bias would
+                                           # inject fake lateral velocity on turns
+                   false, false, true,     # yaw — differential uses Δyaw (== angular vel)
+                   false, false, false,    # twist not fused (zero covariance from wrapper)
+                   false, false, false,
+                   false, false, false]
+    odom1_differential: true
+    odom1_relative: false
+    odom1_queue_size: 10
+
+    process_noise_covariance: [1e-3, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  1e-3, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  1e-3, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.1,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3]
+
+# --- Global EKF: map -> odom ---
+ekf_filter_node_map:
+  ros__parameters:
+    frequency: 30.0
+    two_d_mode: true
+    publish_tf: true
+    publish_acceleration: false
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: map
+
+    # IMU: orientation + angular velocity
+    imu0: /imu/data
+    imu0_config: [false, false, false,    # x, y, z position
+                  true,  true,  true,     # roll, pitch, yaw
+                  false, false, false,    # vx, vy, vz
+                  true,  true,  true,     # vroll, vpitch, vyaw
+                  false, false, false]    # ax, ay, az
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: true
+    imu0_queue_size: 10
+    # 2026-05-26: Same Mahalanobis gates as the odom EKF — see comment there.
+    # Especially important on the map EKF because there's no second yaw source
+    # at 100 Hz (ZED VIO is fused only on the odom EKF).
+    imu0_pose_rejection_threshold: 5.0
+    imu0_twist_rejection_threshold: 5.0
+
+    # 2026-05-26: Wheel odometry fused into the map EKF too (canonical Nav2
+    # tutorial pattern — both EKFs share the same continuous sensors; only
+    # the map EKF additionally has GPS). Before this, the map EKF had NO
+    # linear-velocity prediction source between 4 Hz GPS fixes (250 ms gaps),
+    # so position prediction used stale vx and snapped to GPS deltas on each
+    # update. Fusing /wheel_odom (vx + vyaw) gives the filter a real velocity
+    # prediction model, smoothing map→odom between fixes. Pose drift is not
+    # an issue because we fuse only velocities, not pose, and GPS deltas
+    # correct any long-term drift.
+    odom1: /wheel_odom
+    odom1_config: [false, false, false,    # x, y, z position (drifts, don't fuse)
+                   false, false, false,    # roll, pitch, yaw
+                   true,  false, false,    # vx
+                   false, false, false,    # vyaw  (2026-05-30: wheel vyaw REMOVED from heading — Xsens-only, mirror of odom EKF)
+                   false, false, false]    # ax, ay, az
+    odom1_differential: false
+    odom1_relative: false
+    odom1_queue_size: 10
+
+    # GPS odometry: /odometry/gps (from navsat_transform_node)
+    # 2026-05-12: differential mode + rejection threshold for noisy unaided GPS.
+    # Without an RTK base station, GPS noise (2-5m) was causing the global EKF
+    # to snap-correct the map estimate on every fix, producing visible jumps
+    # in the global costmap. differential=true integrates GPS DELTAS rather
+    # than absolute positions — noise averages out, trend is preserved.
+    # rejection_threshold rejects Mahalanobis-distance outliers >6σ (multipath
+    # spikes). Canonical pattern per robot_localization docs (Tom Moore) for
+    # consumer-grade GPS. Trade-off: map frame drifts slowly (~1-2m over a 10-min
+    # mission) but no jumps. Acceptable for IGVC AutoNav since the 2-5m GPS
+    # noise already dominates absolute waypoint precision.
+    odom0: /odometry/gps
+    odom0_config: [true,  true,  false,   # x, y position from GPS
+                   false, false, false,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false]
+    odom0_differential: false   # 2026-05-30: true->false ABSOLUTE GPS fusion. RTK is now FIXED (cm-accurate, NOT the 2-5 m SBAS this was set for), so fusing absolute position PINS the map frame to GPS -> no more map->odom drift, and /fromLL waypoints land at the right spot. Supersedes the SBAS-era differential mode. (process_noise + rejection-gate re-tune is a later robustness step for RTK FLOAT/dropout, not needed for RTK-FIXED operation.)
+    odom0_relative: false
+    # 2026-05-28 PM: raised 4.0 -> 13.8 (6σ² ≈ tolerate 5 m gap before rejection).
+    # At 4σ² the gate locked out permanently once EKF drifted >3.2 m from GPS
+    # truth (Mahalanobis distance > 4σ → rejected → P never shrinks → gap stays
+    # open forever). Test 2.1 (2026-05-28) showed 36 m EKF/GPS gap after the
+    # chassis was hand-moved with the old threshold. 6σ² aligns with Agent 3's
+    # recommendation for unaided SBAS-grade GPS. See debug_strategy.md.
+    odom0_pose_rejection_threshold: 13.8
+    odom0_queue_size: 10
+
+    # 2026-05-28 PM: x,y process noise 0.1 -> 0.5. Higher process noise grows P
+    # faster between GPS updates, so when /wheel_odom reports nothing (e.g.,
+    # chassis pushed by hand) the Mahalanobis gate stays "alert" to GPS
+    # corrections rather than locking out. Trade-off: marginally more map->odom
+    # jitter under normal stationary operation (still well below 0.5 cm/s per
+    # Test 2.1 baseline). Per Agent 3 of debug_strategy.md.
+    # Previous comment (2026-05-19) on the 0.1 value preserved for reference:
+    #   "Lower process noise makes the filter lean on its smooth prediction
+    #   and follow GPS slowly, so map->odom is steadier and the residual drift
+    #   is spread out (less smear per costmap decay window)."
+    # Trade-off remains; 0.5 chosen as compromise per Agent 3's bias-recovery
+    # analysis.
+    process_noise_covariance: [0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  1e-3, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.1,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3,  0.0,
+                               0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.3]

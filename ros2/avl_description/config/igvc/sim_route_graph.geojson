@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "name": "graph",
+  "comment": "Placeholder so nav2 route_server activates. Parsa's competition BT (navigate_igvc_autonav_2026.xml) does not use routes. Same schema as Paarseus/IGVC_ROS2 cpp_campus_graph.geojson.",
+  "features": [
+    {"type": "Feature", "properties": {"id": 0, "frame": "map"}, "geometry": {"type": "Point", "coordinates": [0.0, 0.1]}},
+    {"type": "Feature", "properties": {"id": 1, "frame": "map"}, "geometry": {"type": "Point", "coordinates": [8.0, 0.1]}},
+    {"type": "Feature", "properties": {"id": 2, "startid": 0, "endid": 1, "cost": 8.0}, "geometry": {"type": "MultiLineString", "coordinates": [[[0.0, 0.1], [8.0, 0.1]]]}}
+  ]
+}

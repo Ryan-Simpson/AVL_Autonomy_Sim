@@ -106,6 +106,30 @@
     <origin xyz="0 0 ${xsens_height}" rpy="0 0 0"/>
   </joint>
 
+  <!-- Xsens IMU and GNSS, following Paarseus/IGVC_ROS2 xsens.yaml: frame imu_link, 100 Hz.
+       /gnss also uses imu_link (Ryan, 21 October; same as Parsa's Webots sim).
+       No noise yet. GNSS 10 Hz is a sim choice, not from the robot. -->
+  <gazebo reference="imu_link">
+    <sensor name="xsens_imu" type="imu">
+      <topic>imu</topic>
+      <ignition_frame_id>imu_link</ignition_frame_id>
+      <update_rate>100</update_rate>
+      <always_on>true</always_on>
+      <!-- Absolute ENU orientation like the Xsens (yaw 0 = east). Parsa's navsat uses IMU yaw directly. -->
+      <imu>
+        <orientation_reference_frame>
+          <localization>ENU</localization>
+        </orientation_reference_frame>
+      </imu>
+    </sensor>
+    <sensor name="xsens_gnss" type="navsat">
+      <topic>navsat</topic>
+      <ignition_frame_id>imu_link</ignition_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+
   <!-- IGVC stand-in: 3.5 in forward and 6.25 in above the IMU. Not a measurements.md value. -->
   <link name="velodyne">
     <visual>
@@ -118,6 +142,43 @@
     <child link="velodyne"/>
     <origin xyz="${p['velodyne_x']} 0 ${xsens_height + p['velodyne_z_above_imu']}" rpy="0 0 0"/>
   </joint>
+
+  <!-- VLP-16 per docs/plans/project-assignments.md section 9: 16 beams, +/-15 deg (2 deg apart),
+       360 deg at 0.2 deg (1800 samples), 0.5-100 m, 10 Hz.
+       Same contract as Paarseus/IGVC_ROS2 avros_sim (Webots VelodynePuck): /velodyne_points, frame velodyne.
+       The velodyne link is lumped into base_link by the URDF->SDF fixed-joint reduction,
+       so ignition_frame_id keeps the ROS frame_id as velodyne.
+       Gazebo topic: /velodyne/points (PointCloudPacked), bridged to /velodyne_points. -->
+  <gazebo reference="velodyne">
+    <sensor name="vlp16" type="gpu_lidar">
+      <topic>velodyne</topic>
+      <ignition_frame_id>velodyne</ignition_frame_id>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>1800</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265</min_angle>
+            <max_angle>3.14159265</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>16</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.26179939</min_angle>
+            <max_angle>0.26179939</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.5</min>
+          <max>100</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+    </sensor>
+  </gazebo>
 
   <!-- Camera boxes stand in for zed_wrapper's zed_macro. -->
   <link name="zed_front_camera_link">
@@ -180,6 +241,63 @@
     <child link="zed_right_optical_frame"/>
     <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
   </joint>
+
+  <!-- ZED X sim cameras, following Paarseus/IGVC_ROS2 avros_bringup/config/zed_front.yaml
+       (grab SVGA, published downscaled to 480x300, 8 Hz, depth 0.3-15 m) and the topics
+       avros_perception subscribes to (zed_wrapper v5.x paths):
+         /zed_<cam>/zed_node/rgb/color/rect/image, .../rgb/color/rect/camera_info,
+         /zed_<cam>/zed_node/point_cloud/cloud_registered (organized, same stamp as the image).
+       HFOV 110 deg is the ZED X 2.2 mm datasheet value, not a measurement. Stand-in.
+       Two sensors per camera because one Gazebo sensor carries one frame_id:
+         camera       -> image + camera_info, frame = optical frame (z forward)
+         rgbd_camera  -> organized cloud, frame = camera link (Gazebo cloud is x forward)
+       Same rate and pose, so both render on the same sim step and share header.stamp.
+       Gazebo topics: zed_<cam>/rgb/image, zed_<cam>/rgb/camera_info, zed_<cam>/depth/points. -->
+  <xacro:macro name="zed_camera_block">
+    <horizontal_fov>1.91986218</horizontal_fov>
+    <image>
+      <width>480</width>
+      <height>300</height>
+      <format>R8G8B8</format>
+    </image>
+    <clip>
+      <near>0.3</near>
+      <far>15</far>
+    </clip>
+  </xacro:macro>
+  <xacro:macro name="zed_sim" params="cam link frame">
+    <gazebo reference="${link}">
+      <sensor name="zed_${cam}_rgb" type="camera">
+        <topic>zed_${cam}/rgb/image</topic>
+        <ignition_frame_id>${frame}</ignition_frame_id>
+        <update_rate>8</update_rate>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <camera>
+          <xacro:zed_camera_block/>
+        </camera>
+      </sensor>
+      <sensor name="zed_${cam}_depth" type="rgbd_camera">
+        <topic>zed_${cam}/depth</topic>
+        <ignition_frame_id>${link}</ignition_frame_id>
+        <update_rate>8</update_rate>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <camera>
+          <xacro:zed_camera_block/>
+          <depth_camera>
+            <clip>
+              <near>0.3</near>
+              <far>15</far>
+            </clip>
+          </depth_camera>
+        </camera>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+  <xacro:zed_sim cam="front" link="zed_front_camera_link" frame="zed_center_optical_frame"/>
+  <xacro:zed_sim cam="left"  link="zed_left_camera_link"  frame="zed_left_optical_frame"/>
+  <xacro:zed_sim cam="right" link="zed_right_camera_link" frame="zed_right_optical_frame"/>
 
   <!-- Track stand-ins. Radius and separation come from Ryan's taped numbers. -->
   <xacro:property name="wheel_radius" value="${p['sprocket_radius']}"/>

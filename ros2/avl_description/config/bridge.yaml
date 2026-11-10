@@ -18,8 +18,80 @@
   gz_type_name: "ignition.msgs.Clock"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/tf"
-  gz_topic_name: "/model/tracked_rover/tf"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "ignition.msgs.Pose_V"
+# No /tf from diff-drive: Parsa's odom EKF (sim.launch.py) is the only odom -> base_link
+# publisher (AGENTS.md, Ryan 2026-11-09).
+
+# VLP-16: gpu_lidar on the velodyne link publishes its cloud on <topic>/points.
+- ros_topic_name: "/velodyne_points"
+  gz_topic_name: "/velodyne/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "ignition.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# ZED X sim cameras (rgbd_camera). ROS names follow avros_perception (zed_wrapper v5.x).
+- ros_topic_name: "/zed_front/zed_node/rgb/color/rect/image"
+  gz_topic_name: "/zed_front/rgb/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_front/zed_node/rgb/color/rect/camera_info"
+  gz_topic_name: "/zed_front/rgb/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_front/zed_node/point_cloud/cloud_registered"
+  gz_topic_name: "/zed_front/depth/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "ignition.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_left/zed_node/rgb/color/rect/image"
+  gz_topic_name: "/zed_left/rgb/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_left/zed_node/rgb/color/rect/camera_info"
+  gz_topic_name: "/zed_left/rgb/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_left/zed_node/point_cloud/cloud_registered"
+  gz_topic_name: "/zed_left/depth/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "ignition.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_right/zed_node/rgb/color/rect/image"
+  gz_topic_name: "/zed_right/rgb/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_right/zed_node/rgb/color/rect/camera_info"
+  gz_topic_name: "/zed_right/rgb/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/zed_right/zed_node/point_cloud/cloud_registered"
+  gz_topic_name: "/zed_right/depth/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "ignition.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# Xsens stand-ins on imu_link.
+- ros_topic_name: "/imu/data"
+  gz_topic_name: "/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "ignition.msgs.IMU"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/gnss"
+  gz_topic_name: "/navsat"
+  ros_type_name: "sensor_msgs/msg/NavSatFix"
+  gz_type_name: "ignition.msgs.NavSat"
   direction: GZ_TO_ROS

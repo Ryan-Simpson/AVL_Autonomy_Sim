@@ -1,0 +1,19 @@
+# Sim waypoints for igvc_course.sdf, in Paarseus/IGVC_ROS2 waypoints.yaml format so his
+# mission_manager reads them unchanged (sent in order, popped at 2.0 m).
+#
+# Picked 2026-11-09 (Ryan's decision 3): counterclockwise from the spawn (map 0, 0.1, facing
+# east) along the south lane, around the south-east bend, then north up the east side.
+# Each point is the max-clearance spot within 2 m of a lane-centerline guess: >= 1.57 m from
+# any painted line (ground.png, placed at world 0, 16.3) and >= 1.65 m from any barrel edge
+# (model.sdf poses, 0.3 m radius). No waypoint inside the east-side barrel slalom
+# (y 7-12); the planner threads it. Map = world because the world origin is the navsat datum.
+# lat/lon came from navsat_transform's /toLL with config/igvc/navsat.yaml, so /fromLL
+# round-trips them. Map (x east, y north) in each comment.
+
+waypoints:
+  - {lat: 34.0593009717832, lon: -117.82176617209157}   # map (8.7, 0.1)  south lane
+  - {lat: 34.05930097173739, lon: -117.82171849636718}   # map (13.1, 0.1)  south lane, 1.65 m short of barrel 1
+  - {lat: 34.059303677122735, lon: -117.8216654029402}   # map (18.0, 0.4)  south-east bend
+  - {lat: 34.059348768066435, lon: -117.82165023327978}   # map (19.4, 5.4)  bend exit, before east-side barrel slalom
+  - {lat: 34.05943804823553, lon: -117.82168382283083}   # map (16.3, 15.3)  east side, after slalom
+  - {lat: 34.05948494283706, lon: -117.82168057211081}   # map (16.6, 20.5)  east side, end

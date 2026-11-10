@@ -1,0 +1,44 @@
+# Copied unchanged from Paarseus/IGVC_ROS2 src/avros_bringup/config/navsat.yaml @ 654ad97 (2026-10-14).
+# Do not edit here; re-copy from upstream. Sim world origin = navsat datum below.
+# navsat_transform_node configuration
+# Based on: https://github.com/ros-navigation/navigation2_tutorials
+#   nav2_gps_waypoint_follower_demo/config/dual_ekf_navsat_params.yaml
+#
+# Converts GPS (NavSatFix) to Cartesian odometry (/odometry/gps)
+# for the global EKF (ekf_filter_node_map) to fuse.
+# The map -> odom TF is published by ekf_filter_node_map, NOT this node.
+
+navsat_transform:
+  ros__parameters:
+    frequency: 30.0
+    delay: 3.0
+
+    # Xsens MTi-680G outputs ENU (yaw=0 facing east) via ROS driver
+    # and uses internal World Magnetic Model for declination correction
+    magnetic_declination_radians: 0.0
+    yaw_offset: 0.0
+
+    zero_altitude: true
+    use_odometry_yaw: false       # Use IMU yaw directly (avoids circular dependency with global EKF)
+    wait_for_datum: true
+    # Datum: anchor for the local Cartesian frame. Update PER TEST SITE.
+    # The four navsat settings (wait_for_datum, datum, use_odometry_yaw,
+    # broadcast_cartesian_transform) are internally coupled per Tom Moore's
+    # dual-EKF guidance — you can't switch wait_for_datum to false in isolation
+    # because that path also requires broadcast_cartesian_transform=true +
+    # use_odometry_yaw=true, which conflicts with our dual-EKF architecture
+    # (ekf_filter_node_map already publishes map→odom; navsat broadcast would
+    # create a TF loop). See https://docs.nav2.org/tutorials/docs/navigation2_with_gps.html
+    #
+    # Past datums (for reference):
+    #   CPP campus      : [34.059270, -117.820934, 0.0]   (cpp_campus_graph.geojson is anchored here)
+    #   SW Michigan test: [42.40154,  -86.283748, 0.0]    (2026-05-26 field testing)
+    #   IGVC 2026 (Oakland U) practice course: [42.667925, -83.218195, 0.0]   (2026-05-28)
+    #
+    # Long-term fix: see issue tracker for "navsat auto-datum helper node" — a
+    # one-shot Python node that reads /gnss and calls /datum service. Or per
+    # Phase B (issue #12), decommissioning navsat_transform entirely in favor
+    # of gnss_carrot_node moots this whole concern.
+    datum: [34.05930007, -117.82186044, 0.0]   # [lat_deg, lon_deg, heading_rad] — 2026-09-25 CPP test spot: 40 s mean of /gnss while MTi rtk_status=2 (RTK FIXED, EarthScope PSDM_RTCM3P3), 160 samples, 7.8 cm max wander. Update per session site change. DO NOT put altitude here; 3rd slot is heading_rad.
+    publish_filtered_gps: true
+    broadcast_cartesian_transform: false   # EKF #2 publishes map -> odom; navsat broadcast would create TF loop
