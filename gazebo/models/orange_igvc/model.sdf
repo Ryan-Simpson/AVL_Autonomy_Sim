@@ -16,6 +16,10 @@
           <pbr>
             <metal>
               <albedo_map>materials/textures/ground.png</albedo_map>
+              <!-- Matte, non-metal ground so cameras see the texture's paint/asphalt
+                   brightness (white paint V~255) instead of an ogre2 metal-darkened copy. -->
+              <metalness>0</metalness>
+              <roughness>1</roughness>
             </metal>
           </pbr>
         </material>

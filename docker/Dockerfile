@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ros-${ROS_DISTRO}-pointcloud-to-laserscan \
       ros-${ROS_DISTRO}-robot-localization \
       ros-${ROS_DISTRO}-nav2-bringup \
+      ros-${ROS_DISTRO}-spatio-temporal-voxel-layer \
       ros-${ROS_DISTRO}-slam-toolbox \
       python3-colcon-common-extensions \
       python3-vcstool \

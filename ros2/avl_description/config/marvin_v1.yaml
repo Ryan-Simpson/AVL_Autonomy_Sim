@@ -1,0 +1,64 @@
+# MARVIN, version 1: every mechanical number urdf/tracked_rover.urdf.xacro uses.
+#
+# One named number per line, each with its source after it, using the codes in
+# assets/measurements.md: tape | CAD | datasheet | estimate, or IGVC / brief for the
+# stand-ins it lists today. stand-in marks a sim-only number with no row there.
+# Ryan 21 October is his team-thread message of that date.
+#
+# The xacro reads this file with xacro.load_yaml; model:=v1 picks it, and is the default.
+# A new design (v2, from mech's CAD) is a new file beside this one, not a rewrite of the xacro.
+
+# IMU height above ground, 21.875 in. The box and sensor heights below are offsets from it.
+imu_height: 0.5556             # IGVC, measurements.md imu_link z
+
+# Main chassis box: 29.25 x 26.75 x 14.75 in
+main_length: 0.7430            # IGVC
+main_width: 0.6795             # IGVC
+main_height: 0.3747            # IGVC
+main_x: 0.3143                 # IGVC, box centre forward of base_link
+main_z_below_imu: 0.2191       # IGVC, box centre below the IMU
+
+# Top sensor platform: 23.00 x 22.50 x 5.75 in
+top_length: 0.5842             # IGVC
+top_width: 0.5715              # IGVC
+top_height: 0.1461             # IGVC
+top_x: 0.1143                  # IGVC, box centre forward of base_link
+top_z_above_imu: 0.0413        # IGVC, box centre above the IMU
+
+# Tread enclosures: 32.5 x 3.5 x 5.5 in. The xacro halves the track width for their offset.
+tread_length: 0.8255           # IGVC
+tread_width: 0.0889            # IGVC
+tread_height: 0.1397           # IGVC
+tread_x: 0.3143                # IGVC, box centre forward of base_link
+tread_z_below_imu: 0.4763      # IGVC, box centre below the IMU
+
+# Drive
+track_width: 0.7336            # tape, Ryan 21 October
+sprocket_radius: 0.0404        # tape, Ryan 21 October
+wheel_x_rear: -0.05            # stand-in, four contacts so the chassis cannot pitch onto its nose
+wheel_x_front: 0.55            # stand-in
+
+# Masses and inertia. Whole robot 49 kg: chassis link 45 kg, four wheels 1 kg each.
+body_mass: 45.0                # brief
+body_inertia: "3.0 6.0 7.5"    # IGVC, ixx iyy izz of the IGVC placeholder scaled by 45/150
+wheel_mass: 1.0                # brief
+wheel_inertia: 0.01            # stand-in, same on every axis
+
+# Sensor mounts relative to base_link. Heights are offsets from imu_height.
+velodyne_x: 0.089              # IGVC, 3.5 in forward of the IMU
+velodyne_z_above_imu: 0.159    # IGVC, 6.25 in above the IMU
+zed_front_x: 0.6795            # IGVC
+zed_front_z_below_imu: 0.108   # IGVC
+zed_front_pitch_deg: 15        # IGVC, 15 deg down
+zed_left_xy: "0.098 0.286"     # IGVC
+zed_left_z_above_imu: 0.057    # IGVC
+zed_left_rpy: "0 0 1.5708"     # IGVC, faces left
+zed_right_xy: "0.098 -0.286"   # IGVC
+zed_right_z_above_imu: 0.057   # IGVC
+zed_right_rpy: "0 0 -1.5708"   # IGVC, faces right
+
+# Speed limits the drive plugin clips to
+max_linear_velocity: 0.4       # Ryan 21 October, m/s
+min_linear_velocity: -0.4      # Ryan 21 October, m/s
+max_angular_velocity: 1.5      # Ryan 21 October, rad/s
+min_angular_velocity: -1.5     # Ryan 21 October, rad/s

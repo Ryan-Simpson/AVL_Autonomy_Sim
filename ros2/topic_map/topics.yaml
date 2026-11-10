@@ -69,11 +69,11 @@ topics:
     frame_id: velodyne
     notes: VLP-16, about 10 Hz.
   zed_front_image:
-    name: /zed_front/zed_node/rgb/image_rect_color
+    name: /zed_front/zed_node/rgb/color/rect/image
     type: sensor_msgs/msg/Image
     direction: publish
     frame_id: zed_center_optical_frame
-    notes: Front camera. The URDF link is zed_center_link. Perception yaml also mentions /zed_front/zed_node/rgb/color/rect/image.
+    notes: Front camera. zed_wrapper v5.x path, which avros_perception subscribes to (Paarseus/IGVC_ROS2 perception.yaml and CLAUDE.md, 2026-11-09). Old name rgb/image_rect_color is pre-v5.
   zed_front_cloud:
     name: /zed_front/zed_node/point_cloud/cloud_registered
     type: sensor_msgs/msg/PointCloud2
@@ -84,7 +84,7 @@ topics:
     direction: publish
     notes: Front VIO. EKF uses yaw only.
   zed_left_image:
-    name: /zed_left/zed_node/rgb/image_rect_color
+    name: /zed_left/zed_node/rgb/color/rect/image
     type: sensor_msgs/msg/Image
     direction: publish
     frame_id: zed_left_optical_frame
@@ -97,7 +97,7 @@ topics:
     type: nav_msgs/msg/Odometry
     direction: publish
   zed_right_image:
-    name: /zed_right/zed_node/rgb/image_rect_color
+    name: /zed_right/zed_node/rgb/color/rect/image
     type: sensor_msgs/msg/Image
     direction: publish
     frame_id: zed_right_optical_frame
